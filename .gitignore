@@ -1,2 +1,5 @@
-other
+.gitignore
+clique
 .DS_Store
+*.o
+

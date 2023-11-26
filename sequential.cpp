@@ -5,7 +5,7 @@
 
 
 // Helper function to check if a number exists in a vector
-bool inVector( std::vector<int> neighbors, int targetValue) {
+bool inVector(std::vector<int> neighbors, int targetValue) {
     bool found = false;
     for (int element : neighbors) {
         if (element == targetValue) {
@@ -55,7 +55,7 @@ std::vector<std::vector<int>> getAllCombinations(const std::vector<int>& input, 
 // sequential clique solving algorithm
 bool sequentialClique(std::map<int, std::vector<int>> graph, int targetCount) {
   // Loop through all the keys
-  for (auto const& entry : graph){
+  for (auto const& entry : graph) {
     if (graph[entry.first].size() >= targetCount) {
       std::vector<int> numbers = graph[entry.first];
       numbers.push_back(entry.first);
@@ -70,10 +70,10 @@ bool sequentialClique(std::map<int, std::vector<int>> graph, int targetCount) {
 }
 
 
-int main() {
-  std::cout << "Hello, World!" << std::endl;
-  return 0;
-}
+// int main() {
+//   std::cout << "Hello, World!" << std::endl;
+//   return 0;
+// }
 
 
 
