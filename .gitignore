@@ -1,5 +1,4 @@
-.gitignore
 clique
-.DS_Store
+.vscode
 *.o
 
