@@ -18,8 +18,8 @@ int main(int argc, const char **argv) {
     }
   }
   std::cout << "poop" << std::endl;
-  // bool isClique = sequentialClique(graph, 3);
-  // std::cout << "result: " << isClique << std::endl;
+  bool isClique = sequentialClique(graph, 3);
+  std::cout << "result: " << isClique << std::endl;
   // Call graph generation
   // Call sequential algorithm (return timing)
   // Call parallel algorithm (return timin)
