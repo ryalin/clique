@@ -22,7 +22,8 @@ bool isClique(std::map<int, std::vector<int>> graph, std::vector<int> innerVecto
     std::vector<int> curNeighbors = graph[element];
     for (int element2 : innerVector) {
       if (element == element2) continue;
-      if (!inVector(curNeighbors, element)) return false;
+      std::vector<int> secondNei = graph[element2];
+      if (!inVector(secondNei, element)) return false;
     }
   }
   return true;
@@ -56,7 +57,7 @@ std::vector<std::vector<int>> getAllCombinations(const std::vector<int>& input, 
 bool sequentialClique(std::map<int, std::vector<int>> graph, int targetCount) {
   // Loop through all the keys
   for (auto const& entry : graph) {
-    if (graph[entry.first].size() >= targetCount) {
+    if (graph[entry.first].size() >= targetCount - 1) {
       std::vector<int> numbers = graph[entry.first];
       numbers.push_back(entry.first);
       std::vector<std::vector<int>> combs = getAllCombinations(numbers, targetCount);
@@ -70,10 +71,7 @@ bool sequentialClique(std::map<int, std::vector<int>> graph, int targetCount) {
 }
 
 
-// int main() {
-//   std::cout << "Hello, World!" << std::endl;
-//   return 0;
-// }
+
 
 
 
