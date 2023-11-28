@@ -9,11 +9,11 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
 
-run: $(TARGET)
-	./$(TARGET)
-
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	rm -f $(OBJS) $(TARGET)
+
+run:
+	./$(TARGET)
