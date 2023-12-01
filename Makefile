@@ -1,5 +1,6 @@
-CC = clang++
-CFLAGS = -Wall -g -std=c++11
+CXX = clang++
+CPPFLAGS = -Wall -g -std=c++11
+LDFLAGS = -pthread
 TARGET = clique
 SRCS = main.cpp sequential.cpp test.cpp openMP.cpp
 OBJS = $(SRCS:.cpp=.o)
@@ -7,13 +8,10 @@ OBJS = $(SRCS:.cpp=.o)
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CXX) $(CPPFLAGS) $(LDFLAGS) -o $@ $^
 
 %.o: %.cpp
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CXX) $(CPPFLAGS) -c -o $@ $<
 
 clean:
 	rm -f $(OBJS) $(TARGET)
-
-run:
-	./$(TARGET)

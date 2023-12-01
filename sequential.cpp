@@ -55,7 +55,7 @@ std::vector<std::set<int>> getAllCombinations(const std::set<int>& input, int si
 }
 
 // sequential clique solving algorithm
-bool sequentialClique(std::map<int, std::set<int>> graph, int targetCount) {
+bool sequentialClique(std::map<int,std::set<int>> graph, int targetCount) {
   // Loop through all the keys
   for (auto const& entry : graph) {
     if (graph[entry.first].size() >= targetCount - 1) {
@@ -67,6 +67,7 @@ bool sequentialClique(std::map<int, std::set<int>> graph, int targetCount) {
       }
       numbers.erase(entry.first);
     }
+    std::cout << "Loop" << std::endl;
   }
   return false;
 }
