@@ -48,8 +48,8 @@ int main(int argc, char *argv[]) {
   // t: target clique size
 
   // Default sizes for graph generation
-  int cliqueSize = 2;
-  std::vector<int> cliqueSizes = {2, 2, 2, 2, 2};
+  int cliqueSize = 3;
+  std::vector<int> cliqueSizes = {3, 3, 3, 3, 3};
   int graphSize = 5;
 
   int option, t;
@@ -84,6 +84,12 @@ int main(int argc, char *argv[]) {
   std::cout << "done" << std::endl;
 
   if (checkCorrectness) {
+    for (int i = 0; i < tests.size(); i++) {
+      bool nonRecurse = sequentialClique(tests[i].first, t);
+      bool recurse = sequentialRecursive(tests[i].first, t);
+      std::cout << "non recurse: " << nonRecurse << std::endl;
+      std::cout << "recurse: " << recurse << std::endl;
+    }
     // Call openmp version with each graph
     // Call sequential version with each graph
     // Check if outputs are the same
