@@ -7,7 +7,7 @@
 
 #include "test.h"
 #include "sequential.h"
-#include "openMP.h"
+#include "parallel.h"
 #include "timing.h"
 
 // Displays program usage options
@@ -23,34 +23,35 @@ void displayUsage() {
 // Displays final speedups
 void displayResults(std::vector<std::pair<std::map<int,std::set<int>>,std::string>> tests, 
                     std::vector<double> sequentialTimes, std::vector<double> parallelTimes) {
-    std::cout << std::setw(15) << "Test" << std::setw(10) << "Seq Time" <<  
-    std::setw(10) << "OMP Time" << std::setw(10) << "OMP Speedup" << std::setw(10) 
-    << "CUDA Time" << std::setw(10) << "CUDA Speedup" << std::endl;
+    std::cout << std::left << std::setw(20) << "Test Name" << std::setw(15) << "Seq Time" <<  
+    std::setw(15) << "OMP Time" << std::setw(15) << "OMP Speedup" << std::setw(15) 
+    << "CUDA Time" << std::setw(15) << "CUDA Speedup" << std::endl;
+
+    std::cout << "---------------------------------------------------------------------------------------------" << std::endl;
 
     for (int i = 0; i < tests.size(); i++) {
       double seqTime = sequentialTimes[i];
       double ompTime = parallelTimes[i];
       double ompSpeedup = sequentialTimes[i] / parallelTimes[i];
 
-      std::cout << std::setw(15) << tests[i].second << std::setw(10) << seqTime <<  
-      std::setw(10) << ompTime << std::setw(10) << ompSpeedup << std::setw(10) 
-      << 0 << std::setw(10) << 0 << std::endl;
+      std::cout << std::left << std::setw(20) << tests[i].second << std::setw(15) << seqTime <<  
+      std::setw(15) << ompTime << std::setw(15) << ompSpeedup << std::setw(15) 
+      << 0 << std::setw(15) << 0 << std::endl;
     }
 }
 
 
 // Generates graphs then runs benchmarks on sequential and parallel versions
 int main(int argc, char *argv[]) {
-  std::cout << "HELLO" << std::endl;
 
   // Input parameters:
   // c: trigger correctness
   // t: target clique size
 
   // Default sizes for graph generation
-  int cliqueSize = 3;
-  std::vector<int> cliqueSizes = {3, 3, 3, 3, 3};
-  int graphSize = 5;
+  int cliqueSize = 50;
+  std::vector<int> cliqueSizes = {20, 20, 20, 20, 20};
+  int graphSize = 100;
 
   int option, t;
   bool checkCorrectness = false;
@@ -58,6 +59,7 @@ int main(int argc, char *argv[]) {
     switch (option) {
       case 'c':
         checkCorrectness = true;
+        t = 5;
         break;
       case 't':
         t = atoi(optarg);
@@ -77,22 +79,22 @@ int main(int argc, char *argv[]) {
   }
 
   std::cout << "Generating testing graphs...";
-  std::pair<std::map<int,std::set<int>>,std::string> test1(generateOneClique(cliqueSize, graphSize), "one clique");
-  std::pair<std::map<int,std::set<int>>,std::string> test2(multiCliqueGraph(cliqueSizes, graphSize), "multiple cliques");
-  std::pair<std::map<int,std::set<int>>,std::string> test3(generateRandomGraph(graphSize), "random graph");
+  std::pair<std::map<int,std::set<int>>,std::string> test1(generateOneClique(cliqueSize, graphSize), "One Clique");
+  std::pair<std::map<int,std::set<int>>,std::string> test2(multiCliqueGraph(cliqueSizes), "Multiple Cliques");
+  std::pair<std::map<int,std::set<int>>,std::string> test3(generateRandomGraph(graphSize), "Random Graph");
   std::vector<std::pair<std::map<int,std::set<int>>,std::string>> tests = {test1, test2, test3};
   std::cout << "done" << std::endl;
 
   if (checkCorrectness) {
     for (int i = 0; i < tests.size(); i++) {
+      std::cout << "Running test " << tests[i].second << std::endl; 
       bool nonRecurse = sequentialClique(tests[i].first, t);
       bool recurse = sequentialRecursive(tests[i].first, t);
-      std::cout << "non recurse: " << nonRecurse << std::endl;
-      std::cout << "recurse: " << recurse << std::endl;
+      if (nonRecurse != recurse) {
+        std::cout << "Correctness Check Failed" << std::endl;
+      }
     }
-    // Call openmp version with each graph
-    // Call sequential version with each graph
-    // Check if outputs are the same
+    std::cout << "Test passed" << std::endl;
 
   } else {
     std::vector<double> sequentialTimes;
@@ -107,6 +109,11 @@ int main(int argc, char *argv[]) {
 
       Timer parallelTimer;
       // Call parallel version of thingy
+      // sequentialCliqueP(tests[i].first, t);
+      // sequentialRecursive(tests[i].first, t);
+      parallelClique(tests[i].first, t);
+
+
       simTime = parallelTimer.elapsed();
       parallelTimes.push_back(simTime);
     }
