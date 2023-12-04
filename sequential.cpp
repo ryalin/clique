@@ -132,7 +132,7 @@ bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount) {
     if (val.size() + 1 < targetCount) continue;
     std::set<int> starter = {key};
     std::set<int> neighbors = val;
-    ret = ret || recursiveHelper(graph, targetCount, starter, neighbors);
+    if (recursiveHelper(graph, targetCount, starter, neighbors)) ret = true;
   }
   return ret;
 }

@@ -45,7 +45,7 @@ bool parallelClique(std::map<int,std::set<int>> graph, int targetCount) {
     std::set<int> neighbors = val;
     //std::cout << "in" << std::endl;
     #pragma omp task
-    ret = ret || recursiveHelperP(graph, targetCount, starter, neighbors);
+    if (recursiveHelperP(graph, targetCount, starter, neighbors)) ret = true;
   }
   return ret;
 }
