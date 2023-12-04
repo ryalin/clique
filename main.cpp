@@ -90,7 +90,8 @@ int main(int argc, char *argv[]) {
       std::cout << "Running test " << tests[i].second << std::endl; 
       bool nonRecurse = sequentialClique(tests[i].first, t);
       bool recurse = sequentialRecursive(tests[i].first, t);
-      if (nonRecurse != recurse) {
+      bool parallel = parallelClique(tests[i].first, t);
+      if (nonRecurse != recurse || parallel != nonRecurse) {
         std::cout << "Correctness Check Failed" << std::endl;
       }
     }
@@ -103,7 +104,7 @@ int main(int argc, char *argv[]) {
       std::cout << "Running test " << tests[i].second << std::endl; 
 
       Timer sequentialTimer;
-      sequentialClique(tests[i].first, t);
+      sequentialRecursive(tests[i].first, t);
       double simTime = sequentialTimer.elapsed();
       sequentialTimes.push_back(simTime);
 

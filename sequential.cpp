@@ -90,7 +90,8 @@ bool sequentialClique(std::map<int,std::set<int>> graph, int targetCount) {
 //Checks if the node we want to add is connected to all nodes in curr
 bool neiConnected(std::map<int,std::set<int>> graph, std::set<int> curr, int newAdd) {
   std::set<int> newAddNeighbors = graph[newAdd];
-  for (int neighbor: curr) {
+  for (std::set<int>::iterator i = curr.begin(); i != curr.end(); ++i) {
+    int neighbor = *i;
     if (newAddNeighbors.find(neighbor) == newAddNeighbors.end()) return false;
   }
   return true;
@@ -99,7 +100,8 @@ bool neiConnected(std::map<int,std::set<int>> graph, std::set<int> curr, int new
 //recursive funciton to check for cliques
 bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, std::set<int> curr, std::set<int> allNeighbors) {
   if (curr.size() >= targetCount) return true;
-  for (int nei: allNeighbors) {
+  for (std::set<int>::iterator i = allNeighbors.begin(); i != allNeighbors.end(); ++i) {
+    int nei = *i;
     // Make sure we don't check a node that is already in the set 
     if ((curr.find(nei) == curr.end()) && neiConnected(graph, curr, nei)) {
       std::set<int> newCurr = curr;
@@ -110,23 +112,29 @@ bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, std::se
   return false;
 }
 
+std::vector<int> getKeys(std::map<int,std::set<int>> graph) {
+  std::vector<int> keys = {};
+  // Copy the keys to the array
+  for (const auto& entry : graph) {
+    keys.push_back(entry.first);
+  }
+  return keys;
+}
 
 // sequential clique solving algorithm
 bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount) {
   // Loop through all the keys
-  for (auto const& entry : graph) {
-    int node = entry.first;
-    if (graph[node].size() + 1 < targetCount) continue;
-    std::set<int> starter = {node};
-    std::set<int> neighbors = graph[node];
-    //std::cout << "in" << std::endl;
-    if (recursiveHelper(graph, targetCount, starter, neighbors)) {
-      return true;
-    }
-    //std::cout << "out" << std::endl;
+  bool ret = false;
+  std::vector<int> keys = getKeys(graph);
+  for (int i = 0; i < graph.size(); i++) {
+    int key = keys[i];
+    std::set<int> val = graph[key];
+    if (val.size() + 1 < targetCount) continue;
+    std::set<int> starter = {key};
+    std::set<int> neighbors = val;
+    ret = ret || recursiveHelper(graph, targetCount, starter, neighbors);
   }
-  return false;
+  return ret;
 }
 
 
-//lec 5 starting from slide 20
