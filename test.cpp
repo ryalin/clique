@@ -4,17 +4,17 @@
 #include <map>
 #include <set>
 
-// Graph-generating test file
-void printGraph(std::map<int,std::set<int>> graph){
-    std::cout << "\n---------PRINT GRAPH ----------" << std::endl;
-    for (auto const& entry : graph) {
-      std::cout << "node: " << entry.first << std::endl;
-      for (int nei: graph[entry.first]) {
-        std::cout << nei << std::endl;
-      }
-    }
-    std::cout << "---------END ----------" << std::endl;
-}
+// // Graph-generating test file
+// void printGraph(std::map<int,std::set<int>> graph){
+//     std::cout << "\n---------PRINT GRAPH ----------" << std::endl;
+//     for (auto const& entry : graph) {
+//       std::cout << "node: " << entry.first << std::endl;
+//       for (int nei: graph[entry.first]) {
+//         std::cout << nei << std::endl;
+//       }
+//     }
+//     std::cout << "---------END ----------" << std::endl;
+// }
 
 // Given cliqueSize and graphSize, generate graph with singular clique
 // of clique size, with total number of nodes being graphSize
@@ -81,12 +81,12 @@ std::map<int,std::set<int>> generateRandomGraph(int graphSize) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  for (int node = 1; node < graphSize + 1; node++) {
+  for (int node = 0; node < graphSize; node++) {
 
     // Get random neighbor list size
     std::uniform_int_distribution<std::size_t> sizeDistribution(1, graphSize-1);
     std::size_t randomSetSize = sizeDistribution(gen);
-    std::uniform_int_distribution<int> numberDistribution(1, graphSize);
+    std::uniform_int_distribution<int> numberDistribution(0, graphSize-1);
 
     while (graph[node].size() < randomSetSize) {
       // Add random node as neighbor

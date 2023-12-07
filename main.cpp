@@ -6,52 +6,23 @@
 #include <iomanip>
 
 #include "test.h"
-#include "sequential.h"
-#include "parallel.h"
+#include "sequential/sequential.h"
+#include "parallel/parallel.h"
 #include "timing.h"
-
-// Displays program usage options
-void displayUsage() {
-    std::cerr << "Usage: ./clique" << " -c -t <targetCliqueSize> -h" << std::endl;
-    std::cerr << "Options:" << std::endl;
-    std::cerr << "  -c, --optionC           Toggle correctness check" << std::endl;
-    std::cerr << "  -t, --optionG <value>   Clique size to search for" << std::endl;
-    std::cerr << "  -h, --help              Display this help message" << std::endl;
-}
-
-
-// Displays final speedups
-void displayResults(std::vector<std::pair<std::map<int,std::set<int>>,std::string>> tests, 
-                    std::vector<double> sequentialTimes, std::vector<double> parallelTimes) {
-    std::cout << std::left << std::setw(20) << "Test Name" << std::setw(15) << "Seq Time" <<  
-    std::setw(15) << "OMP Time" << std::setw(15) << "OMP Speedup" << std::setw(15) 
-    << "CUDA Time" << std::setw(15) << "CUDA Speedup" << std::endl;
-
-    std::cout << "---------------------------------------------------------------------------------------------" << std::endl;
-
-    for (int i = 0; i < tests.size(); i++) {
-      double seqTime = sequentialTimes[i];
-      double ompTime = parallelTimes[i];
-      double ompSpeedup = sequentialTimes[i] / parallelTimes[i];
-
-      std::cout << std::left << std::setw(20) << tests[i].second << std::setw(15) << seqTime <<  
-      std::setw(15) << ompTime << std::setw(15) << ompSpeedup << std::setw(15) 
-      << 0 << std::setw(15) << 0 << std::endl;
-    }
-}
-
+#include "util.h"
 
 // Generates graphs then runs benchmarks on sequential and parallel versions
 int main(int argc, char *argv[]) {
 
   // Input parameters:
-  // c: trigger correctness
-  // t: target clique size
+  // c: trigger correctness (default checks with 120 clique size)
+  // t: target clique size (to search for)
 
-  // Default sizes for graph generation
-  int cliqueSize = 50;
-  std::vector<int> cliqueSizes = {20, 20, 20, 20, 20};
-  int graphSize = 100;
+  if (argc == 1) {
+    std::cout << "Not enough arguments" << std::endl;
+    displayUsage();
+    return 1;
+  }
 
   int option, t;
   bool checkCorrectness = false;
@@ -59,7 +30,7 @@ int main(int argc, char *argv[]) {
     switch (option) {
       case 'c':
         checkCorrectness = true;
-        t = 5;
+        t = 120;
         break;
       case 't':
         t = atoi(optarg);
@@ -67,8 +38,7 @@ int main(int argc, char *argv[]) {
       case 'h':
         displayUsage();
         return 1;
-      case ':':
-        std::cerr << "Option -" << static_cast<char>(optopt) << " requires an argument." << std::endl;
+      case '?':
         displayUsage();
         return 1;
       default:
@@ -78,46 +48,65 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  std::cout << "Generating testing graphs...";
-  std::pair<std::map<int,std::set<int>>,std::string> test1(generateOneClique(cliqueSize, graphSize), "One Clique");
-  std::pair<std::map<int,std::set<int>>,std::string> test2(multiCliqueGraph(cliqueSizes), "Multiple Cliques");
-  std::pair<std::map<int,std::set<int>>,std::string> test3(generateRandomGraph(graphSize), "Random Graph");
-  std::vector<std::pair<std::map<int,std::set<int>>,std::string>> tests = {test1, test2, test3};
-  std::cout << "done" << std::endl;
+  std::vector<Graph> tests;
+  std::cout << "\nReading graphs..." << std::flush;
+  // One clique graphs with size n, and total size 2n
+  tests.push_back({"one clique 50", readGraphFromTxt("tests/oneClique50.txt")});
+  tests.push_back({"one clique 500", readGraphFromTxt("tests/oneClique500.txt")});
+  tests.push_back({"one clique 5000", readGraphFromTxt("tests/oneClique5000.txt")});
 
-  if (checkCorrectness) {
-    for (int i = 0; i < tests.size(); i++) {
-      std::cout << "Running test " << tests[i].second << std::endl; 
-      bool nonRecurse = sequentialClique(tests[i].first, t);
-      bool recurse = sequentialRecursive(tests[i].first, t);
+  // Multiple cliques with max size of n
+  tests.push_back({"multiple cliques 50", readGraphFromTxt("tests/multiClique50.txt")});
+  tests.push_back({"multiple cliques 500", readGraphFromTxt("tests/multiClique500.txt")});
+  tests.push_back({"multiple cliques 5000", readGraphFromTxt("tests/multiClique5000.txt")});
+
+  // Random graph of n size
+  tests.push_back({"random graph 50", readGraphFromTxt("tests/randomGraph50.txt")});
+  tests.push_back({"random graph 500", readGraphFromTxt("tests/randomGraph500.txt")});
+  tests.push_back({"random graph 5000", readGraphFromTxt("tests/randomGraph5000.txt")});
+  std::cout << "done\n" << std::endl;
+
+  if (checkCorrectness) { // Correctness toggle
+    std::cout << "=============== Correctness Test ================" << std::endl;
+    for (auto graph: tests) {
+      std::cout << "Running test " << graph.name << std::endl; 
+      bool nonRecurse = sequentialClique(graph.nodes, t);
+      bool recurse = sequentialRecursive(graph.nodes, t);
       if (nonRecurse != recurse) {
         std::cout << "Correctness Check Failed" << std::endl;
       }
     }
     std::cout << "Test passed" << std::endl;
 
-  } else {
+  } else { // Benchmarking
+    std::cout << "=============== Benchmark Test ================" << std::endl;
     std::vector<double> sequentialTimes;
-    std::vector<double> parallelTimes;
-    for (int i = 0; i < tests.size(); i++) {
-      std::cout << "Running test " << tests[i].second << std::endl; 
+    std::vector<double> parallelOMPTimes;
+    std::vector<double> parallelCUDATimes;
 
+    for (auto graph: tests) {
+      std::cout << "Running test " << graph.name << std::endl; 
+
+      // Sequential
       Timer sequentialTimer;
-      sequentialClique(tests[i].first, t);
+      sequentialClique(graph.nodes, t);
       double simTime = sequentialTimer.elapsed();
       sequentialTimes.push_back(simTime);
 
-      Timer parallelTimer;
-      // Call parallel version of thingy
-      // sequentialCliqueP(tests[i].first, t);
-      // sequentialRecursive(tests[i].first, t);
-      parallelClique(tests[i].first, t);
+      // Parallel OMP
+      Timer parallelOMPTimer;
 
+      simTime = parallelOMPTimer.elapsed();
+      parallelOMPTimes.push_back(simTime);
 
-      simTime = parallelTimer.elapsed();
-      parallelTimes.push_back(simTime);
+      // Parallel CUDA
+      Timer parallelCUDATimer;
+
+      simTime = parallelCUDATimer.elapsed();
+      parallelCUDATimes.push_back(simTime);
+
     }
-    displayResults(tests, sequentialTimes, parallelTimes);
+    displayResults(tests, sequentialTimes, parallelOMPTimes, parallelCUDATimes);
   }
   return 0;
 }

@@ -2,8 +2,8 @@ CXX = clang++
 CPPFLAGS = -Wall -g -std=c++11 -fopenmp
 LDFLAGS = -pthread
 TARGET = clique
-SRCS = main.cpp sequential.cpp test.cpp parallel.cpp
-OBJS = $(SRCS:.cpp=.o)
+SRCS = main.cpp sequential/sequential.cpp test.cpp util.cpp parallel/parallel.cpp
+OBJS = $(SRCS:%.cpp=%.o)
 
 all: $(TARGET)
 
