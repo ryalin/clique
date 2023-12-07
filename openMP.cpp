@@ -1,1 +1,0 @@
-// Parallel clique solving algorithm
