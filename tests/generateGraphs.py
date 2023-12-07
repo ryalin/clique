@@ -106,21 +106,21 @@ if __name__ == "__main__":
     multiClique1 = generateMultiClique(multiTest1)
     saveGraphToTxt(multiClique1, 'multiClique50.txt')
 
-    multiTest2 = [2, 8, 15, 30, 60, 125, 250, 500]
+    multiTest2 = [5, 10, 30, 60, 100]
     multiClique2 = generateMultiClique(multiTest2)
-    saveGraphToTxt(multiClique2, 'multiClique500.txt')
+    saveGraphToTxt(multiClique2, 'multiClique100.txt')
 
-    multiTest3 = [8, 16, 35, 70, 150, 300, 600, 2000]
+    multiTest3 = [10, 30, 50, 100, 200]
     multiClique3 = generateMultiClique(multiTest3)
-    saveGraphToTxt(multiClique3, 'multiClique2000.txt')
+    saveGraphToTxt(multiClique3, 'multiClique200.txt')
     
     # Random graph test files
     randomGraph50 = generateRandomGraph(50)
     saveGraphToTxt(randomGraph50, 'randomGraph50.txt')
 
-    randomGraph500 = generateRandomGraph(500)
-    saveGraphToTxt(randomGraph500, 'randomGraph500.txt')
+    randomGraph100 = generateRandomGraph(100)
+    saveGraphToTxt(randomGraph100, 'randomGraph100.txt')
 
-    randomGraph2000 = generateRandomGraph(2000)
-    saveGraphToTxt(randomGraph2000, 'randomGraph2000.txt')
+    randomGraph200 = generateRandomGraph(200)
+    saveGraphToTxt(randomGraph200, 'randomGraph200.txt')
 

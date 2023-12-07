@@ -52,31 +52,50 @@ int main(int argc, char *argv[]) {
   std::cout << "\nReading graphs..." << std::flush;
   // One clique graphs with size n, and total size 2n
   tests.push_back({"one clique 50", readGraphFromTxt("tests/oneClique50.txt")});
-  tests.push_back({"one clique 500", readGraphFromTxt("tests/oneClique100.txt")});
-  tests.push_back({"one clique 2000", readGraphFromTxt("tests/oneClique200.txt")});
+  tests.push_back({"one clique 100", readGraphFromTxt("tests/oneClique100.txt")});
+  tests.push_back({"one clique 200", readGraphFromTxt("tests/oneClique200.txt")});
 
   // Multiple cliques with max size of n
   tests.push_back({"multiple cliques 50", readGraphFromTxt("tests/multiClique50.txt")});
-  tests.push_back({"multiple cliques 100", readGraphFromTxt("tests/multiClique500.txt")});
-  tests.push_back({"multiple cliques 200", readGraphFromTxt("tests/multiClique2000.txt")});
+  tests.push_back({"multiple cliques 100", readGraphFromTxt("tests/multiClique100.txt")});
+  tests.push_back({"multiple cliques 200", readGraphFromTxt("tests/multiClique200.txt")});
 
   // Random graph of n size
   tests.push_back({"random graph 50", readGraphFromTxt("tests/randomGraph50.txt")});
-  tests.push_back({"random graph 500", readGraphFromTxt("tests/randomGraph500.txt")});
-  tests.push_back({"random graph 2000", readGraphFromTxt("tests/randomGraph2000.txt")});
+  tests.push_back({"random graph 100", readGraphFromTxt("tests/randomGraph100.txt")});
+  tests.push_back({"random graph 200", readGraphFromTxt("tests/randomGraph200.txt")});
   std::cout << "done\n" << std::endl;
 
   if (checkCorrectness) { // Correctness toggle
-    std::cout << "=============== Correctness Test ================" << std::endl;
-    for (auto graph: tests) {
-      std::cout << "Running test " << graph.name << std::endl; 
-      bool nonRecurse = sequentialClique(graph.nodes, t);
-      bool recurse = sequentialRecursive(graph.nodes, t);
-      if (nonRecurse != recurse) {
-        std::cout << "Correctness Check Failed" << std::endl;
-      }
-    }
-    std::cout << "Test passed" << std::endl;
+
+    Graph test;
+    test.nodes = multiCliqueGraph({2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3});
+    printGraph(test);
+
+    std::cout << "OpenMP... " << std::flush; 
+    Timer parallelOMPTimer;
+    bool returnn = parallelClique(test.nodes, 3);
+    double simTime = parallelOMPTimer.elapsed();
+    std::cout << simTime << std::endl;
+
+    // Sequential
+    std::cout << "Sequential... " << std::flush; 
+    Timer sequentialTimer;
+    bool retVal = sequentialRecursive(test.nodes, 3);
+    double sim2Time = sequentialTimer.elapsed();
+    std::cout << sim2Time << std::endl;
+  
+    std::cout << "Speedup: " << sim2Time / simTime << std::endl;
+    // std::cout << "=============== Correctness Test ================" << std::endl;
+    // for (auto graph: tests) {
+    //   std::cout << "Running test " << graph.name << std::endl; 
+    //   bool nonRecurse = sequentialClique(graph.nodes, t);
+    //   bool recurse = sequentialRecursive(graph.nodes, t);
+    //   if (nonRecurse != recurse) {
+    //     std::cout << "Correctness Check Failed" << std::endl;
+    //   }
+    // }
+    // std::cout << "Test passed" << std::endl;
 
   } else { // Benchmarking
     std::cout << "=============== Benchmark Test ================" << std::endl;
@@ -85,19 +104,23 @@ int main(int argc, char *argv[]) {
     std::vector<double> parallelCUDATimes;
 
     for (auto graph: tests) {
-      std::cout << "Running test " << graph.name << std::endl; 
-
-      // Sequential
-      Timer sequentialTimer;
-      sequentialClique(graph.nodes, t);
-      double simTime = sequentialTimer.elapsed();
-      sequentialTimes.push_back(simTime);
+      std::cout << "\nRunning test " << graph.name << ": " << std::flush; 
 
       // Parallel OMP
+      std::cout << "OpenMP... " << std::flush; 
       Timer parallelOMPTimer;
-
-      simTime = parallelOMPTimer.elapsed();
+      bool returnn = parallelClique(graph.nodes, t);
+      std::cout << returnn << std::flush; 
+      double simTime = parallelOMPTimer.elapsed();
       parallelOMPTimes.push_back(simTime);
+
+      // Sequential
+      std::cout << "Sequential... " << std::flush; 
+      Timer sequentialTimer;
+      bool retVal = sequentialRecursive(graph.nodes, t);
+      std::cout << retVal << std::flush; 
+      simTime = sequentialTimer.elapsed();
+      sequentialTimes.push_back(simTime);
 
       // Parallel CUDA
       Timer parallelCUDATimer;

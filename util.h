@@ -19,3 +19,5 @@ void displayResults(std::vector<Graph> tests,
                     std::vector<double> parallelCUDATimes);
 
 void displayUsage();
+
+void printGraph(Graph graph);

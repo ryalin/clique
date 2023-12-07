@@ -125,9 +125,10 @@ std::vector<int> getKeys(std::map<int,std::set<int>> graph) {
 bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount) {
   // Loop through all the keys
   bool ret = false;
-  std::vector<int> keys = getKeys(graph);
-  for (int i = 0; i < graph.size(); i++) {
-    int key = keys[i];
+  //std::vector<int> keys = getKeys(graph);
+  for (const auto& entry: graph) {
+    int key = entry.first;
+    std::cout << "seq key: " << key << std::endl;
     std::set<int> val = graph[key];
     if (val.size() + 1 < targetCount) continue;
     std::set<int> starter = {key};

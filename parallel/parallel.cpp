@@ -35,18 +35,25 @@ bool recursiveHelperP(std::map<int,std::set<int>> graph, int targetCount, std::s
 bool parallelClique(std::map<int,std::set<int>> graph, int targetCount) {
   // Loop through all the keys
   bool ret = false;
-  std::vector<int> keys = getKeys(graph);
-  #pragma omp parallel for
+  //std::vector<int> keys = getKeys(graph);
+  #pragma omp parallel 
   for (int i = 0; i < graph.size(); i++) {
-    int key = keys[i];
+    int key = i;
     std::set<int> val = graph[key];
     if (val.size() + 1 < targetCount) continue;
+    #pragma omp task shared(ret)
+    {
     std::set<int> starter = {key};
     std::set<int> neighbors = val;
     //std::cout << "in" << std::endl;
-    bool cur;
-    cur = recursiveHelperP(graph, targetCount, starter, neighbors); 
-    ret = cur || ret;
+    // bool cur;
+    ret = ret || recursiveHelperP(graph, targetCount, starter, neighbors); 
+    }
+    // if (ret) {
+    //   // #pragma omp cancel parallel
+    //   return true;
+    // }
+    // ret = cur || ret;
   }
   return ret;
 }
