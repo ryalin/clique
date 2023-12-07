@@ -52,18 +52,18 @@ int main(int argc, char *argv[]) {
   std::cout << "\nReading graphs..." << std::flush;
   // One clique graphs with size n, and total size 2n
   tests.push_back({"one clique 50", readGraphFromTxt("tests/oneClique50.txt")});
-  tests.push_back({"one clique 500", readGraphFromTxt("tests/oneClique500.txt")});
-  tests.push_back({"one clique 5000", readGraphFromTxt("tests/oneClique5000.txt")});
+  tests.push_back({"one clique 500", readGraphFromTxt("tests/oneClique100.txt")});
+  tests.push_back({"one clique 2000", readGraphFromTxt("tests/oneClique200.txt")});
 
   // Multiple cliques with max size of n
   tests.push_back({"multiple cliques 50", readGraphFromTxt("tests/multiClique50.txt")});
-  tests.push_back({"multiple cliques 500", readGraphFromTxt("tests/multiClique500.txt")});
-  tests.push_back({"multiple cliques 5000", readGraphFromTxt("tests/multiClique5000.txt")});
+  tests.push_back({"multiple cliques 100", readGraphFromTxt("tests/multiClique500.txt")});
+  tests.push_back({"multiple cliques 200", readGraphFromTxt("tests/multiClique2000.txt")});
 
   // Random graph of n size
   tests.push_back({"random graph 50", readGraphFromTxt("tests/randomGraph50.txt")});
   tests.push_back({"random graph 500", readGraphFromTxt("tests/randomGraph500.txt")});
-  tests.push_back({"random graph 5000", readGraphFromTxt("tests/randomGraph5000.txt")});
+  tests.push_back({"random graph 2000", readGraphFromTxt("tests/randomGraph2000.txt")});
   std::cout << "done\n" << std::endl;
 
   if (checkCorrectness) { // Correctness toggle

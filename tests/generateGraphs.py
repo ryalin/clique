@@ -95,7 +95,7 @@ if __name__ == "__main__":
     saveGraphToTxt(oneClique50, 'oneClique50.txt')
 
     oneClique100 = generateOneClique(100, 2000)
-    saveGraphToTxt(oneClique100, 'oneClique200.txt')
+    saveGraphToTxt(oneClique100, 'oneClique100.txt')
 
     # Make some changes to numbers here (higher ratio of graph size to clique Size)
     oneClique200 = generateOneClique(200, 4000)
