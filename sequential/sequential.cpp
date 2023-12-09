@@ -121,7 +121,7 @@ std::vector<int> getKeys(std::map<int,std::set<int>> graph) {
   return keys;
 }
 
-// sequential clique solving algorithm
+// sequential clique solving algorithm matt sucks
 bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount) {
   // Loop through all the keys
   bool ret = false;
