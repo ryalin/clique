@@ -69,21 +69,22 @@ int main(int argc, char *argv[]) {
   if (checkCorrectness) { // Correctness toggle
 
     Graph test;
-    test.nodes = multiCliqueGraph({2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3});
+    // test.nodes = multiCliqueGraph({2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3});
+    test.nodes = multiCliqueGraph({6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7});
     printGraph(test);
 
     std::cout << "OpenMP... " << std::flush; 
     Timer parallelOMPTimer;
-    bool returnn = parallelClique(test.nodes, 3);
+    bool returnn = parallelClique(test.nodes, 7);
     double simTime = parallelOMPTimer.elapsed();
-    std::cout << simTime << std::endl;
+    std::cout << simTime << " " << returnn << std::endl;
 
     // Sequential
     std::cout << "Sequential... " << std::flush; 
     Timer sequentialTimer;
-    bool retVal = sequentialRecursive(test.nodes, 3);
+    bool retVal = sequentialRecursive(test.nodes, 7);
     double sim2Time = sequentialTimer.elapsed();
-    std::cout << sim2Time << std::endl;
+    std::cout << sim2Time << " " << retVal << std::endl;
   
     std::cout << "Speedup: " << sim2Time / simTime << std::endl;
     // std::cout << "=============== Correctness Test ================" << std::endl;
