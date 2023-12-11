@@ -2,9 +2,9 @@ import random
 
 # Python file to generate graph txt files
 
-# Generates a single clique of cliqueSize, then attaches
-# the rest of the nodes to the clique
-def generateOneClique(cliqueSize, graphSize):
+# Generates a single clique of cliqueSize
+# used for quick correctness checks
+def generateOneClique(cliqueSize):
   graph = dict()
 
   # Create a clique of cliqueSize
@@ -15,18 +15,12 @@ def generateOneClique(cliqueSize, graphSize):
         continue
       graph[node].add(neighbor)
 
-  # Connect rest of nodes to clique
-  for node in range(cliqueSize, graphSize):
-    graph[node] = set()
-    correspCliqueNode = (node - cliqueSize) % cliqueSize
-    graph[node].add(correspCliqueNode)
-    graph[correspCliqueNode].add(node)
-
   return graph
   
 
 # Given cliqueSizes, generates multiplie cliques then
 # connect them using one node from each clique
+# used for quick correctness checks
 def generateMultiClique(cliqueSizes):
   graph = dict()
   usedNodes = 0
@@ -59,6 +53,7 @@ def generateMultiClique(cliqueSizes):
 
 
 # Generates a random graph given graphSize
+# used for benchmarking
 def generateRandomGraph(graphSize):
   graph = dict()
 
@@ -91,36 +86,19 @@ def saveGraphToTxt(graph, filename):
 if __name__ == "__main__":
     
     # One clique test files
-    oneClique50 = generateOneClique(50, 1000)
-    saveGraphToTxt(oneClique50, 'oneClique50.txt')
+    oneClique5 = generateOneClique(5)
+    saveGraphToTxt(oneClique5, 'one_clique5.txt')
 
-    oneClique100 = generateOneClique(100, 2000)
-    saveGraphToTxt(oneClique100, 'oneClique100.txt')
+    oneClique15 = generateOneClique(15)
+    saveGraphToTxt(oneClique15, 'one_clique15.txt')
 
-    # Make some changes to numbers here (higher ratio of graph size to clique Size)
-    oneClique200 = generateOneClique(200, 4000)
-    saveGraphToTxt(oneClique200, 'oneClique200.txt')
+    oneClique30 = generateOneClique(30)
+    saveGraphToTxt(oneClique30, 'one_clique30.txt')
 
-    # Multiple clique test files
-    multiTest1 = [10, 20, 30, 40, 50]
-    multiClique1 = generateMultiClique(multiTest1)
-    saveGraphToTxt(multiClique1, 'multiClique50.txt')
+    oneClique45 = generateOneClique(45)
+    saveGraphToTxt(oneClique45, 'one_clique45.txt')
 
-    multiTest2 = [5, 10, 30, 60, 100]
-    multiClique2 = generateMultiClique(multiTest2)
-    saveGraphToTxt(multiClique2, 'multiClique100.txt')
-
-    multiTest3 = [10, 30, 50, 100, 200]
-    multiClique3 = generateMultiClique(multiTest3)
-    saveGraphToTxt(multiClique3, 'multiClique200.txt')
-    
-    # Random graph test files
-    randomGraph50 = generateRandomGraph(50)
-    saveGraphToTxt(randomGraph50, 'randomGraph50.txt')
-
-    randomGraph100 = generateRandomGraph(100)
-    saveGraphToTxt(randomGraph100, 'randomGraph100.txt')
-
-    randomGraph200 = generateRandomGraph(200)
-    saveGraphToTxt(randomGraph200, 'randomGraph200.txt')
-
+    # Multiple clique test file
+    multiTest = [10, 20, 30, 40, 50, 60, 70, 80]
+    multiClique = generateMultiClique(multiTest)
+    saveGraphToTxt(multiClique, 'multi_clique80.txt')

@@ -7,7 +7,9 @@
 #include <map>
 #include <iomanip>
 
+// Graph struct: has size, name, and node datastructure
 struct Graph {
+  int targetSize;
   std::string name;
   std::map<int,std::set<int>> nodes;
 };
@@ -39,7 +41,7 @@ std::map<int,std::set<int>> readGraphFromTxt(const std::string& filename) {
 }
 
 
-// Graph-generating test file
+// Prints contents of a graph
 void printGraph(Graph graph){
   std::cout << "\n--- PRINT GRAPH " << graph.name << "---" << std::endl;
   for (auto node: graph.nodes) {
@@ -78,10 +80,12 @@ void displayResults(std::vector<Graph> tests,
 
 // Displays program usage options
 void displayUsage() {
-  std::cerr << "\nUsage: ./clique" << " -c -t <targetCliqueSize> -h" << std::endl;
+  std::cerr << "\nUsage: ./clique" << " -c -b -p -t <test parameters> -h" << std::endl;
   std::cerr << "Options:" << std::endl;
-  std::cerr << "  -c           Toggle correctness check" << std::endl;
-  std::cerr << "  -t <value>   Clique size to search for" << std::endl;
-  std::cerr << "  -h           Display this help message\n" << std::endl;
+  std::cerr << "  -c                         Toggle correctness check" << std::endl;
+  std::cerr << "  -b                         Toggle benchmark check" << std::endl;
+  std::cerr << "  -t <graphParams> <target>  Single test run with paramters" << std::endl;
+  std::cerr << "  -p                         Toggle parallel test run" << std::endl;
+  std::cerr << "  -h                         Display this help message\n" << std::endl;
 }
 

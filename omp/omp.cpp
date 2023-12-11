@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <set>
+#include "mpi.h"
 
 //Checks if the node we want to add is connected to all nodes in curr
 bool neiConnectedP2(std::map<int,std::set<int>> graph, std::set<int> curr, int newAdd) {
