@@ -55,28 +55,23 @@ void printGraph(Graph graph){
 // Displays final speedups
 void displayResults(std::vector<Graph> tests, 
                     std::vector<double> sequentialTimes, 
-                    std::vector<double> parallelOMPTimes,
-                    std::vector<double> parallelCUDATimes) {
+                    std::vector<double> parallelTimes) {
 
   std::cout << std::left << std::setw(30) 
   << "\nTest Name" << std::setw(15) << "Seq Time" << std::setw(15) 
-  << "OMP Time" << std::setw(15) << "OMP Speedup" << std::setw(15) 
-  << "CUDA Time" << std::setw(15) << "CUDA Speedup" << std::endl;
+  << "Parallel Time" << std::setw(15) << "Parallel Speedup" << std::endl;
 
   std::cout << "---------------------------------------------------------"
   "----------------------------------------------" << std::endl;
 
   for (int i = 0; i < tests.size(); i++) {
     double seqTime = sequentialTimes[i];
-    double ompTime = parallelOMPTimes[i];
-    double cudaTime = parallelCUDATimes[i];
-    double ompSpeedup = seqTime / ompTime;
-    double cudaSpeedup = seqTime / cudaTime;
+    double parTime = parallelTimes[i];
+    double speedup = seqTime / parTime;
 
     std::cout << std::left << std::setw(30) 
     << tests[i].name << std::setw(15) << seqTime << std::setw(15) 
-    << ompTime << std::setw(15) << ompSpeedup << std::setw(15) 
-    << cudaTime << std::setw(15) << cudaSpeedup << "\n" << std::endl;
+    << parTime << std::setw(15) << speedup << std::setw(15) << std::endl;
   }
 }
 
@@ -85,8 +80,8 @@ void displayResults(std::vector<Graph> tests,
 void displayUsage() {
   std::cerr << "\nUsage: ./clique" << " -c -t <targetCliqueSize> -h" << std::endl;
   std::cerr << "Options:" << std::endl;
-  std::cerr << "  -c, --optionC           Toggle correctness check" << std::endl;
-  std::cerr << "  -t, --optionG <value>   Clique size to search for" << std::endl;
-  std::cerr << "  -h, --help              Display this help message\n" << std::endl;
+  std::cerr << "  -c           Toggle correctness check" << std::endl;
+  std::cerr << "  -t <value>   Clique size to search for" << std::endl;
+  std::cerr << "  -h           Display this help message\n" << std::endl;
 }
 

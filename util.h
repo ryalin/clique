@@ -15,8 +15,7 @@ std::map<int,std::set<int>> readGraphFromTxt(const std::string& filename);
 
 void displayResults(std::vector<Graph> tests, 
                     std::vector<double> sequentialTimes, 
-                    std::vector<double> parallelOMPTimes, 
-                    std::vector<double> parallelCUDATimes);
+                    std::vector<double> parallelTimes);
 
 void displayUsage();
 
