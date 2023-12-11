@@ -4,21 +4,9 @@
 #include <map>
 #include <set>
 
-// // Graph-generating test file
-// void printGraph(std::map<int,std::set<int>> graph){
-//     std::cout << "\n---------PRINT GRAPH ----------" << std::endl;
-//     for (auto const& entry : graph) {
-//       std::cout << "node: " << entry.first << std::endl;
-//       for (int nei: graph[entry.first]) {
-//         std::cout << nei << std::endl;
-//       }
-//     }
-//     std::cout << "---------END ----------" << std::endl;
-// }
-
 // Given cliqueSize and graphSize, generate graph with singular clique
 // of clique size, with total number of nodes being graphSize
-std::map<int,std::set<int>> generateOneClique(int cliqueSize, int graphSize) {
+std::map<int,std::set<int>> generateOneClique(int cliqueSize) {
   std::map<int,std::set<int>> graph;
   // Create a clique of cliqueSize
   for (int node = 0; node < cliqueSize; node++) {
@@ -28,13 +16,6 @@ std::map<int,std::set<int>> generateOneClique(int cliqueSize, int graphSize) {
       }
       graph[node].insert(neighbor);
     }
-  }
-  // Connects rest of nodes to clique
-  for (int node = cliqueSize; node < graphSize; node++) {
-    // Assign other nodes to one of the nodes in the clique
-    int corrCliqueNode = (node - cliqueSize) % cliqueSize;
-    graph[node].insert(corrCliqueNode);
-    graph[corrCliqueNode].insert(node);
   }
   return graph;
 }
@@ -75,29 +56,24 @@ std::map<int,std::set<int>> multiCliqueGraph(std::vector<int> cliqueSizes) {
 
 
 // Generates a random graph with graphSize nodes
-std::map<int,std::set<int>> generateRandomGraph(int graphSize) {
-  std::map<int,std::set<int>> graph;
-  // Generate random device
-  std::random_device rd;
-  std::mt19937 gen(rd());
+std::map<int, std::set<int>> generateRandom(int graphSize, double edgeProb) {
+    std::map<int, std::set<int>> graph;
 
-  for (int node = 0; node < graphSize; node++) {
+    // Random number generator
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0.0, 1.0);
 
-    // Get random neighbor list size
-    std::uniform_int_distribution<std::size_t> sizeDistribution(1, graphSize-1);
-    std::size_t randomSetSize = sizeDistribution(gen);
-    std::uniform_int_distribution<int> numberDistribution(0, graphSize-1);
-
-    while (graph[node].size() < randomSetSize) {
-      // Add random node as neighbor
-      int randomNumber = numberDistribution(gen);
-      if (node != randomNumber) {
-        graph[node].insert(randomNumber);
-        graph[randomNumber].insert(node);
-      }
+    // Generate edges based on the probability
+    for (int i = 0; i < graphSize; ++i) {
+        for (int j = i + 1; j < graphSize; ++j) {
+            if (dis(gen) < edgeProb) {
+                graph[i].insert(j);
+                graph[j].insert(i);
+            }
+        }
     }
-  }
-  return graph;
+    return graph;
 }
 
 

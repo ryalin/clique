@@ -3,6 +3,8 @@
 
 #include <chrono>
 
+// Timing file taken from previous 15418 labs
+
 class Timer {
 public:
   Timer() : beg_(clock_::now()) {}

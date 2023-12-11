@@ -1,9 +1,10 @@
-CXX = clang++
+CXX = mpic++
+MPICXX = mpic++
 CPPFLAGS = -Wall -g -std=c++11 -fopenmp
 LDFLAGS = -pthread
+
 TARGET = clique
 SRCS = main.cpp \
-       ../sequential/sequential.cpp \
        ../sequential/sequentialRecursive.cpp \
        ../test.cpp \
        ../util.cpp \
@@ -13,10 +14,10 @@ OBJS = $(SRCS:%.cpp=%.o)
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CPPFLAGS) $(LDFLAGS) -o $@ $^
+	$(MPICXX) $(CPPFLAGS) $(LDFLAGS) -o $@ $^
 
 %.o: %.cpp
-	$(CXX) $(CPPFLAGS) -c -o $@ $<
+	$(MPICXX) $(CPPFLAGS) -c -o $@ $<
 
 clean:
 	rm -f $(OBJS) $(TARGET)
