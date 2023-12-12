@@ -1,8 +1,8 @@
-#include <iostream>
 #include <map>
 #include <vector>
-#include <algorithm>
 #include <set>
+
+// Kind of defunct initial brute force version
 
 // Checks if a given set of nodes is a clique
 bool isClique(std::map<int, std::set<int>> graph, std::set<int> innerVector) {
