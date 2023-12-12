@@ -95,10 +95,7 @@ if __name__ == "__main__":
     oneClique30 = generateOneClique(30)
     saveGraphToTxt(oneClique30, 'one_clique30.txt')
 
-    oneClique45 = generateOneClique(45)
-    saveGraphToTxt(oneClique45, 'one_clique45.txt')
-
     # Multiple clique test file
     multiTest = [10, 20, 30, 40, 50, 60, 70, 80]
     multiClique = generateMultiClique(multiTest)
-    saveGraphToTxt(multiClique, 'multi_clique80.txt')
+    saveGraphToTxt(multiClique, 'multi_clique.txt')

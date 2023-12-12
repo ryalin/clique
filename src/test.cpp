@@ -57,26 +57,21 @@ std::map<int,std::set<int>> multiCliqueGraph(std::vector<int> cliqueSizes) {
 
 // Generates a random graph with graphSize nodes
 std::map<int, std::set<int>> generateRandom(int graphSize, double edgeProb) {
-    std::map<int, std::set<int>> graph;
+  std::map<int, std::set<int>> graph;
 
-    // Random number generator
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(0.0, 1.0);
+  // Random number generator
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> dis(0.0, 1.0);
 
-    // Generate edges based on the probability
-    for (int i = 0; i < graphSize; ++i) {
-        for (int j = i + 1; j < graphSize; ++j) {
-            if (dis(gen) < edgeProb) {
-                graph[i].insert(j);
-                graph[j].insert(i);
-            }
-        }
+  // Generate edges based on the probability
+  for (int i = 0; i < graphSize; ++i) {
+    for (int j = i + 1; j < graphSize; ++j) {
+      if (dis(gen) < edgeProb) {
+        graph[i].insert(j);
+        graph[j].insert(i);
+      }
     }
-    return graph;
+  }
+  return graph;
 }
-
-
-
-
-

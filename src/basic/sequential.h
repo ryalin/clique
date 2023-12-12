@@ -1,5 +1,3 @@
-// Header file to store sequential function defenitions 
-#include <iostream>
 #include <map>
 #include <set>
 
