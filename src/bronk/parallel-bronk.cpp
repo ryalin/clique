@@ -113,6 +113,77 @@ bool bronKerboschParallel(const std::map<int,std::set<int>>& graph, int k) {
 }
 
 
+#include <omp.h>
+#include <set>
+#include <map>
+#include <algorithm>
+#include <vector>
+
+void setIntersectionP2(const std::set<int>& set1, const std::set<int>& set2, 
+                      std::set<int>& result) {
+    result.clear();
+    std::set_intersection(set1.begin(), set1.end(), set2.begin(), 
+                          set2.end(), std::inserter(result, result.begin()));
+}
+
+bool bronKerboschRecurseP2(std::set<int>& R, std::set<int>& P, std::set<int>& X, 
+                          const std::map<int, std::set<int>>& graph, int k, bool& cliqueFound) {
+    if (R.size() >= k) {
+        cliqueFound = true;
+        return true;
+    }
+
+    if (P.empty() && X.empty()) {
+        return false;
+    }
+
+    std::vector<int> setVector(P.begin(), P.end());
+
+    #pragma omp parallel
+    #pragma omp single nowait
+    {
+        for (int v : setVector) {
+            if (!cliqueFound) {
+                std::set<int> neighbors = graph.at(v);
+                std::set<int> P_intersection;
+                std::set<int> X_intersection;
+
+                R.insert(v);
+                setIntersectionP2(P, neighbors, P_intersection);
+                setIntersectionP2(X, neighbors, X_intersection);
+
+                #pragma omp task firstprivate(P_intersection, X_intersection, R) shared(cliqueFound)
+                {
+                    bronKerboschRecurseP2(R, P_intersection, X_intersection, graph, k, cliqueFound);
+                }
+
+                R.erase(v);
+                P.erase(v);
+                X.insert(v);
+            }
+        }
+    }
+
+    #pragma omp taskwait
+    return cliqueFound;
+}
+
+bool bronKerboschParallel2(const std::map<int, std::set<int>>& graph, int k) {
+    if (k > graph.size()) {
+        return false;
+    }
+    std::set<int> R, P, X;
+    bool cliqueFound = false;
+
+    for (const auto& entry : graph) {
+        P.insert(entry.first);
+    }
+
+    bronKerboschRecurseP2(R, P, X, graph, k, cliqueFound);
+    return cliqueFound;
+}
+
+
 // Runs parallel bron-kerbosch algorithm against normal version
 int main(int argc, char *argv[]) {
 
@@ -182,7 +253,7 @@ int main(int argc, char *argv[]) {
             }
 
             // Check if clique is in graph
-            bool res1 = bronKerboschParallel(graph.nodes, graph.targetSize);
+            bool res1 = bronKerboschParallel2(graph.nodes, graph.targetSize);
             bool res2 = bronKerbosch(graph.nodes, graph.targetSize);
             if ((res1 != res2) && (pid == 0)) {
                 std::cerr << "Error: sequential and parallel returned different results" << std::endl;
@@ -195,7 +266,7 @@ int main(int argc, char *argv[]) {
                 return 0;
             }
             // Check if target size clique is non-existent
-            res1 = bronKerboschParallel(graph.nodes, graph.targetSize + 2);
+            res1 = bronKerboschParallel2(graph.nodes, graph.targetSize + 2);
             res2 = bronKerbosch(graph.nodes, graph.targetSize + 2);
             if ((res1 != res2) && (pid == 0)) {
                 std::cerr << "Error: sequential and parallel returned different results" << std::endl;
@@ -214,7 +285,7 @@ int main(int argc, char *argv[]) {
             if (pid == 0) {
                 std::cout << "Running test multi_clique" << i * 10 << std::endl;
             }
-            bool res1 = bronKerboschParallel(multi.nodes, i * 10);
+            bool res1 = bronKerboschParallel2(multi.nodes, i * 10);
             bool res2 = bronKerbosch(multi.nodes, i * 10);
             if ((res1 != res2) && (pid == 0)) {
                 std::cerr << "Error: sequential and parallel returned different results" << std::endl;
@@ -255,16 +326,20 @@ int main(int argc, char *argv[]) {
         graph = adjacencyMatrixToMap(matrix, s);
     }
     MPI_Barrier(MPI_COMM_WORLD);
-
+if (pid == 0) {
     Timer parallelTimer;
-    bool parRes = bronKerboschParallel(graph, t);
+    bool parRes = bronKerboschParallel2(graph, t);
     double parSimTime = parallelTimer.elapsed();
+
+    Timer parallelTimer1;
+    //bool parRes1 = bronKerboschParallel(graph, t);
+    double parSimTime1 = parallelTimer1.elapsed();
 
     Timer seqTimer;
     bool seqRes = bronKerbosch(graph, t);
     double seqSimTime = seqTimer.elapsed();
 
-    if (pid == 0) {
+    
         if (parRes != seqRes) {
             std::cout << "Error: Parallel and Sequential Returned Different Values" << std::endl;
             MPI_Finalize();
@@ -272,13 +347,13 @@ int main(int argc, char *argv[]) {
         }
 
         std::cout << std::left << "\n" << std::setw(15) << "Sequential" << std::setw(15) 
-        << "Parallel" << std::setw(15) << "Speedup" << std::setw(15) 
+        << "Parallel" << std::setw(15) << "Parallel1" << std::setw(15) << "Speedup" << std::setw(15) 
         << "Contains Clique?" << std::endl;
 
         std::cout << "--------------------------------------------------------------" << std::endl;
 
         std::cout << std::left << std::setw(15) << seqSimTime << std::setw(15) 
-        << parSimTime << std::setw(15) << seqSimTime / parSimTime << std::setw(15)
+        << parSimTime << std::setw(15) << parSimTime1 << std::setw(15) << seqSimTime / parSimTime << std::setw(15)
         << std::setw(15) << parRes << "\n" << std::endl;
     }
     MPI_Finalize();
