@@ -43,9 +43,13 @@ In the time that we did have, we set up a codebase, created necessary files, and
 
 This week was dedicated to completing parallelization with OpenMP and starting CUDA parallelization. It is also dedicated to starting the milestone report. Because of week 2 being behind schedule, the work in week 3 was also behind. For week 3, we worked out bugs from the previous week, wrote python scripts to generate large testing files, created a faster (recursive) and less memory intensive sequential implementation, and worked on parallelization with OpenMP. We also cleaned up the codebase.
 
-### Week 4 (12/2 - 12/8) (IN PROGRESS)
+### Week 4 (12/2 - 12/8)
 
-This week is still a work in progress, but the milestone report was done and submitted on 12/4/2023. At this moment in time, we have a small bit of OpenMP parallelization to do, with some benchmarking needed to ensure the speedup hits our targets of num_cores * 1/2. CUDA parallelization should start mid-late week. One roadblock we may face are exams in other courses, which should mostly wrap up around 12/6, leaving us ample time to work on the project for the rest of the time.
+After the readjustment of schedules and the submission of the milestone report, we finished OpenMP parallezation. There was a lot of time spent on reordering file structure, thinking about good tests, and writing benchmarking code. One roadblock we may face are exams in other courses, which should mostly wrap up around 12/6, leaving us ample time to work on the project for the rest of the time. We started looking into CUDA parallelization strategies.
+
+### Week 5 (12/9 - 12/15) (IN PROGRESS)
+
+After a meeting with professor and a couple hours of experimentation, we decided that a CUDA implementation was not feasible for parallelizing the clique decision problem. We have since pivoted to using MPI and OpenMP in conjuction to speedup our recursive clique finder code (it is finished). We also introduced our own Bron-Kerbosch algorithm implementation and are working to effectively parallelizing it with OpenMP. We have also started the project report and posterboard design.
 
 ## Current Revised Schedule
 
@@ -55,17 +59,17 @@ This week is still a work in progress, but the milestone report was done and sub
 | 11/18 - 11/24 | - Setup codebase, write test cases | - Test parallization techniques |
 | 11/25 - 12/1 | - Improving codebase, test file generation scripts | - Start OpenMP parallelization |
 | 12/2 - 12/5 | - Benchmark OpenMP results, assist on parallelization | - Finish parallelization with OpenMP |
-| 12/6 - 12/8 | - Clean up codebase and ensure robust testing, assistance on CUDA parallelization | - Start CUDA parallelization |
-| 12/9 - 12/12 | - Finish parallelization with CUDA<br>-Benchmark results | Same as Ryan |
-| 12/13 - 12/14 | - Final checks and benchmarks, writing final project report, prepare poster | Same as Ryan |
+| 12/6 - 12/8 | - Clean up codebase and ensure robust testing, assistance on parallelization | - Add MPI to existing parallel code |
+| 12/9 - 12/12 | - Start Bron-Kerbosch algorithm parallelization | - Help Ryan |
+| 12/13 - 12/15 | - Benchmarking results, writing final project report, prepare poster | Same as Ryan |
 
 ## Milestone Report
 
 ### Summary of work so far
 
-In week 1, we researched and found an np-complete problem (clique decision) to solve. The week ended with the completion of a project proposal. In the subsequent weeks up until now, we set up a codebase, wrote scripts to generate testing files, wrote the sequential algorithm in multiple ways to find the best one in terms of speed, and started parallelizing using OpenMP. We also introduced some bug fixes to our existing code this week and are wrapping up this milestone report (inception).
+In week 1, we researched and found an np-complete problem (clique decision) to solve. The week ended with the completion of a project proposal. In the subsequent weeks up until now, we set up a codebase, wrote scripts to generate testing files, wrote the sequential algorithm in multiple ways to find the best one in terms of speed, and started finished parallelizing the best one with MPI and OpenMP. We implemented the Bron-Kerbosch algorithm and are wrapping up parallelization with OpenMP, while starting on benchmarking, project report and posterboard;
 
-### Thoughts on goals and deliverables
+### Thoughts on goals and deliverables (Outdated)
 
 The goals and deliverables stated in the proposal still seem very much doable and achievable, but we are currently slightly behind schedule due to the nature of how we initially planned our work. Our original plan was to parallelizing the clique decision algorithm using OpenMP and CUDA, achieving at least ½ * core_count speedup, and we seem to be on track. 
 
@@ -79,15 +83,8 @@ New Goals: The new goals are largely the same as the old ones, except with the r
 
 ### Plan with presentation
 
-At the poster session, we plan to show graphs denoting the benchmark results obtained from parallelization with OpenMP and CUDA. If time allows, we may also develop a demo to show, where the audience can give us a clique size they want to search for in our graphs.
+At the poster session, we plan to show graphs denoting the benchmark results obtained from parallelization with OpenMP and MPI.
 
-### Preliminary results
-
-We currently do not have concrete preliminary results. We do have some initial speedups calculated from our OpenMP parallel implementation but still have to verify correctness.
-
-### Concerns and issues
-
-It seems to be just a matter of coding and doing the work, in the face of a busy schedule. We still are thinking of ways to parallelize our code the best way possible, but that will take some trial and error which takes lots of time.
 
 
 
