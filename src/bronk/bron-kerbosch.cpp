@@ -46,6 +46,9 @@ bool bronKerboschRecurse(std::set<int>& R, std::set<int>& P, std::set<int>& X,
 
 // Implementation of bron-kerbosch algorithm
 bool bronKerbosch(const std::map<int, std::set<int>>& graph, int k) {
+    if (k > graph.size()) {
+      return false;
+    }
     std::set<int> r;
     std::set<int> p;
     std::set<int> x;
