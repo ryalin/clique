@@ -59,36 +59,41 @@ void setIntersectionP(const std::set<int>& set1, const std::set<int>& set2,
 // Bron-Kerbosch algorithm recursive helper
 bool bronKerboschRecurseP(std::set<int>& R, std::set<int>& P, std::set<int>& X, 
                          const std::map<int, std::set<int>>& graph, int k) {
-    if (P.empty() && X.empty()) {
-
-        if (R.size() >= k) {
-            return true;
-        }
-        return false;
+    if (R.size() >= k) {
+        return true;
     }
-    std::set<int> P_copy = P;
-    #pragma parallel for shared(P_copy)
-    for (int v : P_copy) {
+
+    bool cliqueFound = false;
+    std::vector<int> setVector(P.begin(), P.end());
+
+    #pragma parallel for shared(P_copy, cliqueFound)
+    for (int i = 0; i < setVector.size(); i++) {
+        int v = setVector[i];
         std::set<int> neighbors = graph.at(v);
         std::set<int> P_intersection;
         std::set<int> X_intersection;
+        std::set<int> P_copy = P;
+        std::set<int> X_copy = X;
+        std::set<int> R_copy = R;
 
-        R.insert(v);
-
+        R_copy.insert(v);  
         setIntersectionP(P_copy, neighbors, P_intersection);
-
-        setIntersectionP(X, neighbors, X_intersection);
-
-
-        bool res = bronKerboschRecurseP(R, P_intersection, X_intersection, graph, k);
-        if (res) {
-            return true;
+        setIntersectionP(X_copy, neighbors, X_intersection);
+        
+        bool res = false;
+        #pragma omp task shared(res)
+        {
+            // #pragma omp critical
+        {
+            res = bronKerboschRecurseP(R_copy, P_intersection, X_intersection, graph, k);
         }
-        R.erase(v);
-        P.erase(v);
-        X.insert(v);
+        }
+        cliqueFound = cliqueFound | res;
+
+        P_copy.erase(v);
+        X_copy.insert(v);
     }
-    return false;
+    return cliqueFound;
 }
 
 
