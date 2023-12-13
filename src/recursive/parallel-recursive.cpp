@@ -12,48 +12,39 @@
 #include "../util.h"
 
 
-// // Function to convert a map to an adjacency matrix
-// std::vector<std::vector<int>> mapToAdjacencyMatrix(const std::map<int, std::set<int>>& graph) {
-//     // Find the maximum node ID to determine the size of the matrix
-//     int maxNodeID = 0;
-//     for (const auto& entry : graph) {
-//         maxNodeID = std::max(maxNodeID, entry.first);
-//         for (int neighbor : entry.second) {
-//             maxNodeID = std::max(maxNodeID, neighbor);
-//         }
-//     }
-
-//     // Initialize the matrix with zeros
-//     std::vector<std::vector<int>> adjacencyMatrix(maxNodeID + 1, std::vector<int>(maxNodeID + 1, 0));
-
-//     // Fill in the matrix based on the graph
-//     for (const auto& entry : graph) {
-//         int node = entry.first;
-//         for (int neighbor : entry.second) {
-//             adjacencyMatrix[node][neighbor] = 1;
-//             adjacencyMatrix[neighbor][node] = 1;  // Assuming an undirected graph
-//         }
-//     }
-//     return adjacencyMatrix;
-// }
+int** mapToAdjacencyMatrix(std::map<int, std::set<int>>& graph, int size) {
+    // Initialize the matrix with zeros
+    int** adjacencyMatrix = new int*[size];
+    for (int i = 0; i < size; ++i) {
+        adjacencyMatrix[i] = new int[size]();
+    }
+    // Fill in the matrix based on the graph
+    for (const auto& entry : graph) {
+        int node = entry.first;
+        for (int neighbor : entry.second) {
+            adjacencyMatrix[node][neighbor] = 1;
+            adjacencyMatrix[neighbor][node] = 1;
+        }
+    }
+    return adjacencyMatrix;
+}
 
 
-// // Function to convert an adjacency matrix to a map
-// std::map<int, std::set<int>> adjacencyMatrixToMap(const std::vector<std::vector<int>>& adjacencyMatrix) {
-//     std::map<int, std::set<int>> graph;
+std::map<int, std::set<int>> adjacencyMatrixToMap(int** adjacencyMatrix, int size) {
+    std::map<int, std::set<int>> graph;
 
-//     // Iterate through the rows and columns of the matrix
-//     for (int i = 0; i < adjacencyMatrix.size(); ++i) {
-//         for (int j = 0; j < adjacencyMatrix[i].size(); ++j) {
-//             // If there is an edge (matrix[i][j] is non-zero), add it to the map
-//             if (adjacencyMatrix[i][j] != 0) {
-//                 graph[i].insert(j);
-//                 graph[j].insert(i);  // Assuming an undirected graph
-//             }
-//         }
-//     }
-//     return graph;
-// }
+    // Iterate through the rows and columns of the matrix
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            // If there is an edge (matrix[i][j] is non-zero), add it to the map
+            if (adjacencyMatrix[i][j] != 0) {
+                graph[i].insert(j);
+                graph[j].insert(i);
+            }
+        }
+    }
+    return graph;
+}
 
 
 //Checks if the node we want to add is connected to all nodes in curr
@@ -96,17 +87,17 @@ bool parallelRecursive(std::map<int,std::set<int>> graph, int targetCount) {
   int graphSize = graph.size();
   int chunkSize = (graphSize + nproc - 1) / nproc;
   int lower = pid * chunkSize;
-  int upper = std::min((pid + 1) * chunkSize, graphSize);
+  int upper = (pid + 1) * chunkSize;
+  if (upper > graphSize) upper = graphSize;
 
   bool ret = false;
   #pragma omp parallel 
   #pragma omp single
-  // for (int i = chunkSize * pid; i < chunkSize * (pid + 1); i++) {
   for (int i = lower; i < upper; i++) {
     if (ret) continue;
     int key = i;
     std::set<int> val = graph[key];
-    if (val.size() + 1 < targetCount) continue;
+    // if (val.size() + 1 < targetCount) continue;
     #pragma omp task shared(ret) if (!ret)
     {
     std::set<int> starter = {key};
@@ -118,14 +109,16 @@ bool parallelRecursive(std::map<int,std::set<int>> graph, int targetCount) {
     }
   }
 
-  std::vector<int> gatheredBooleans(nproc);
-  MPI_Gather(&ret, 1, MPI_INT, gatheredBooleans.data(), 1, MPI_INT, 0, MPI_COMM_WORLD);
+  bool* gatheredBooleans;
   if (pid == 0) {
-    bool newRet;
+    gatheredBooleans = new bool[graph.size()];
+  }
+  MPI_Gather(&ret, 1, MPI_CXX_BOOL, gatheredBooleans, 1, MPI_CXX_BOOL, 0, MPI_COMM_WORLD);
+  if (pid == 0) {
+    bool newRet = false;
     for (int i = 0; i < nproc; i++) {
       newRet = newRet | gatheredBooleans[i];
     }
-    std::cout << newRet << std::endl;
     return newRet;
   }
   return ret;
@@ -149,8 +142,9 @@ int main(int argc, char *argv[]) {
 
   MPI_Init(&argc, &argv);
 
-  int pid;
+  int pid, nproc;
   MPI_Comm_rank(MPI_COMM_WORLD, &pid);
+  MPI_Comm_size(MPI_COMM_WORLD, &nproc);
 
   int option;
   int s = 30;
@@ -187,26 +181,30 @@ int main(int argc, char *argv[]) {
       }
   }
 
-  if ((checkCorrectness) && (pid == 0)) {
+  if (checkCorrectness) {
     std::vector<Graph> tests;
     tests.push_back({4, "one_clique5", readGraphFromTxt("../tests/one_clique5.txt")});
     tests.push_back({14, "one_clique15", readGraphFromTxt("../tests/one_clique15.txt")});
     tests.push_back({29, "one_clique30", readGraphFromTxt("../tests/one_clique30.txt")});
 
-    std::cout << "---------------- Correctness Test (OMP) -----------------" << std::endl;
+    if (pid == 0) {
+    std::cout << "---------------- Correctness Test (REC) -----------------" << std::endl;
+    }
 
     for (auto graph: tests) {
-      std::cout << "Running test " << graph.name << std::endl;
+      if (pid == 0) {
+        std::cout << "Running test " << graph.name << std::endl;
+      }
 
       // Check if clique is in graph
       bool res1 = parallelRecursive(graph.nodes, graph.targetSize);
       bool res2 = sequentialRecursive(graph.nodes, graph.targetSize);
-      if (res1 != res2) {
+      if ((res1 != res2) && (pid == 0)) {
         std::cerr << "Error: sequential and parallel returned different results" << std::endl;
         MPI_Finalize();
         return 0;
       }
-      if (res1 == 0) {
+      if ((res1 == 0) && (pid == 0)) {
         std::cerr << "Error: output should be true" << std::endl;
         MPI_Finalize();
         return 0;
@@ -214,45 +212,64 @@ int main(int argc, char *argv[]) {
       // Check if target size clique is non-existent
       res1 = parallelRecursive(graph.nodes, graph.targetSize + 2);
       res2 = sequentialRecursive(graph.nodes, graph.targetSize + 2);
-      if (res1 != res2) {
+      if ((res1 != res2) && (pid == 0)) {
         std::cerr << "Error: sequential and parallel returned different results" << std::endl;
         MPI_Finalize();
         return 0;
       }
-      if (res1 == 1) {
-        std::cerr << "Error: output should be false" << std::endl;
-        MPI_Finalize();
-        return 0;
+      if ((res1 == 1) && (pid == 0)) {
+          std::cerr << "Error: output should be false" << std::endl;
+          MPI_Finalize();
+          return 0;
       }
     }
-    Graph multi;
-    multi.nodes = readGraphFromTxt("../tests/multi_clique.txt");
-    for (int i = 0; i < 5; i++) {
-      std::cout << "Running test multi_clique" << i * 20 << std::endl;
-      bool res1 = parallelRecursive(multi.nodes, i * 20);
-      bool res2 = sequentialRecursive(multi.nodes, i * 20);
-      if (res1 != res2) {
-        std::cerr << "Error: sequential and parallel returned different results" << std::endl;
-        MPI_Finalize();
-        return 0;
+      Graph multi;
+      multi.nodes = readGraphFromTxt("../tests/multi_clique.txt");
+      for (int i = 0; i < 5; i++) {
+          if (pid == 0) {
+              std::cout << "Running test multi_clique" << i * 20 << std::endl;
+          }
+          bool res1 = parallelRecursive(multi.nodes, i * 20);
+          bool res2 = sequentialRecursive(multi.nodes, i * 20);
+          if ((res1 != res2) && (pid == 0)) {
+              std::cerr << "Error: sequential and parallel returned different results" << std::endl;
+              MPI_Finalize();
+              return 0;
+          }
+          if ((res1 == 0) && (pid == 0)) {
+              std::cerr << "Error: output should be true" << std::endl;
+              MPI_Finalize();
+              return 0;
+          }
       }
-      if (res1 == 0) {
-        std::cerr << "Error: output should be true" << std::endl;
-        MPI_Finalize();
-        return 0;
+      if (pid == 0) {
+          std::cout << "All tests passed!" << std::endl;
       }
-    }
-    std::cout << "All tests passed!" << std::endl;
-    MPI_Finalize();
-    return 0;
+      MPI_Finalize();
+      return 0;
   }
+
   // Generate random graph with command line size and density
-  std::map<int, std::set<int>> graph = generateRandom(s, d);
-
+  std::map<int, std::set<int>> graph;
+  int** matrix;
   if (pid == 0) {
-    printf("\n------ Test with graph size %d, density %.2f, target %d ------\n", s, d, t);
+    printf("\n------ Test with graph size %d, density %.4f, target %d ------\n", s, d, t);
+    graph = generateRandom(s, d);
+    matrix = mapToAdjacencyMatrix(graph, s);
+    for (int receiver = 1; receiver < nproc; receiver++) {
+      for (int row = 0; row < s; row++) {
+        MPI_Send(matrix[row], s, MPI_INT, receiver, row, MPI_COMM_WORLD);
+      }
+    }
+  } else {
+    matrix = new int*[s];
+    for (int row = 0; row < s; row++) {
+      matrix[row] = new int[s];
+      MPI_Recv(matrix[row], s, MPI_INT, 0, row, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    }
+    graph = adjacencyMatrixToMap(matrix, s);
   }
-
+  MPI_Barrier(MPI_COMM_WORLD);
   Timer parallelTimer;
   bool parRes = parallelRecursive(graph, t);
   double parSimTime = parallelTimer.elapsed();
@@ -262,21 +279,20 @@ int main(int argc, char *argv[]) {
   double seqSimTime = seqTimer.elapsed();
 
   if (pid == 0) {
-    std::cout << "SEQ OUT "<<  seqRes << std::endl;
-      if (parRes != seqRes) {
-          std::cout << "Error: Parallel and Sequential Returned Different Values" << std::endl;
-          MPI_Finalize();
-          return 0;
-      }
-      std::cout << std::left << "\n" << std::setw(15) << "Sequential" << std::setw(15) 
-      << "Parallel" << std::setw(15) << "Speedup" << std::setw(15) 
-      << "Contains Clique?" << std::endl;
+    if (parRes != seqRes) {
+      std::cout << "Error: Parallel and Sequential Returned Different Values" << std::endl;
+      MPI_Finalize();
+      return 0;
+    }
+    std::cout << std::left << "\n" << std::setw(15) << "Sequential" << std::setw(15) 
+    << "Parallel" << std::setw(15) << "Speedup" << std::setw(15) 
+    << "Contains Clique?" << std::endl;
 
-      std::cout << "--------------------------------------------------------------" << std::endl;
+    std::cout << "--------------------------------------------------------------" << std::endl;
 
-      std::cout << std::left << std::setw(15) << seqSimTime << std::setw(15) 
-      << parSimTime << std::setw(15) << seqSimTime / parSimTime << std::setw(15) 
-      << std::setw(15) << parRes << "\n" << std::endl;
+    std::cout << std::left << std::setw(15) << seqSimTime << std::setw(15) 
+    << parSimTime << std::setw(15) << seqSimTime / parSimTime << std::setw(15) 
+    << std::setw(15) << parRes << "\n" << std::endl;
   }
   MPI_Finalize();
   return 0;

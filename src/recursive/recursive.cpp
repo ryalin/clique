@@ -1,16 +1,7 @@
 #include <map>
 #include <vector>
 #include <set>
-
-// // Checks if newAdd (prospective node in clique) is connected to existing clique
-// bool connected(std::map<int,std::set<int>> graph, std::set<int> curr, int newAdd) {
-//   std::set<int> newAddNeighbors = graph[newAdd];
-//   for (std::set<int>::iterator i = curr.begin(); i != curr.end(); i++) {
-//     int neighbor = *i;
-//     if (newAddNeighbors.find(neighbor) == newAddNeighbors.end()) return false;
-//   }
-//   return true;
-// }
+#include <iostream>
 
 //Checks if the node we want to add is connected to all nodes in curr
 bool connected(std::map<int,std::set<int>> graph, std::set<int> curr, int newAdd) {
@@ -43,16 +34,18 @@ bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, std::se
 
 // Recursive clique size-finding wrapper
 bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount) {
-
+  int count = 0;
   // Loop through all the keys
   for (const auto& entry: graph) {
     int node = entry.first;
     std::set<int> neighbors = graph[node];
 
     // There are not enough neighbors for this node to be in the target clique
-    if (neighbors.size() + 1 < targetCount) continue;
+    // if (neighbors.size() + 1 < targetCount) continue;
     std::set<int> starter = {node};
-    if (recursiveHelper(graph, targetCount, starter, neighbors)) return true;
+    if (recursiveHelper(graph, targetCount, starter, neighbors)) {
+      count++;
+    }
   }
-  return false;
+  return count;
 }
