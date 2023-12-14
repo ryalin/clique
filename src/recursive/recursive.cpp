@@ -28,7 +28,7 @@ bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, std::se
       std::set<int> newCurrClique = currClique;
       newCurrClique.insert(neighbor);
       bool res = recursiveHelper(graph, targetCount, newCurrClique, allNeighbors);
-      if (res) return true;
+      if (res) return true; 
     }
   }
   return found;
@@ -43,7 +43,10 @@ bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount) {
     std::set<int> neighbors = graph[node];
     std::set<int> starter = {node};
     bool res = recursiveHelper(graph, targetCount, starter, neighbors);
-    if (res) return true;
+    if (res)  {
+      std::cout << "FOUND NODE: " << node << std::endl;
+      return true;
+    }
   }
   return found;
 }

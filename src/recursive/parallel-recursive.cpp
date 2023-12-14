@@ -270,6 +270,7 @@ int main(int argc, char *argv[]) {
     graph = adjacencyMatrixToMap(matrix, s);
   }
   MPI_Barrier(MPI_COMM_WORLD);
+
   Timer parallelTimer;
   bool parRes = parallelRecursive(graph, t);
   double parSimTime = parallelTimer.elapsed();
