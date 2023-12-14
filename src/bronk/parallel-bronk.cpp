@@ -5,6 +5,7 @@
 #include <set>
 #include <map>
 #include <mpi.h>
+#include <omp.h>
 
 #include "bron-kerbosch.h"
 #include "../test.h"
@@ -47,69 +48,54 @@ std::map<int, std::set<int>> adjacencyMatrixToMap(int** adjacencyMatrix, int siz
 }
 
 
-// Given 2 sets, finds the intersection and populates into result
-void setIntersectionP(const std::set<int>& set1, const std::set<int>& set2, 
-                     std::set<int>& result) {
-    result.clear();
-    set_intersection(set1.begin(), set1.end(), set2.begin(), 
-                     set2.end(), inserter(result, result.begin()));
-}
-
-
-// Bron-Kerbosch algorithm recursive helper
 bool bronKerboschRecurseP(std::set<int>& R, std::set<int>& P, std::set<int>& X, 
-                         const std::map<int, std::set<int>>& graph, int k) {
+                         const std::map<int, std::set<int>>& graph, int k, bool& cliqueFound) {
     if (R.size() >= k) {
+        cliqueFound = true;
         return true;
     }
-
-    bool cliqueFound = false;
+    if (P.empty() && X.empty()) {
+        return false;
+    }
     std::vector<int> setVector(P.begin(), P.end());
 
-    #pragma parallel for shared(P_copy, cliqueFound)
-    for (int i = 0; i < setVector.size(); i++) {
-        int v = setVector[i];
-        std::set<int> neighbors = graph.at(v);
-        std::set<int> P_intersection;
-        std::set<int> X_intersection;
-        std::set<int> P_copy = P;
-        std::set<int> X_copy = X;
-        std::set<int> R_copy = R;
+    #pragma omp parallel
+    #pragma omp single nowait
+    for (int v : setVector) {
+        if (!cliqueFound) {
+            std::set<int> neighbors = graph.at(v);
+            std::set<int> P_intersection;
+            std::set<int> X_intersection;
 
-        R_copy.insert(v);  
-        setIntersectionP(P_copy, neighbors, P_intersection);
-        setIntersectionP(X_copy, neighbors, X_intersection);
-        
-        bool res = false;
-        #pragma omp task shared(res)
-        {
-            // #pragma omp critical
-        {
-            res = bronKerboschRecurseP(R_copy, P_intersection, X_intersection, graph, k);
-        }
-        }
-        cliqueFound = cliqueFound | res;
+            R.insert(v);
+            setIntersection(P, neighbors, P_intersection);
+            setIntersection(X, neighbors, X_intersection);
 
-        P_copy.erase(v);
-        X_copy.insert(v);
+            #pragma omp task firstprivate(P_intersection, X_intersection, R) shared(cliqueFound)
+            bronKerboschRecurseP(R, P_intersection, X_intersection, graph, k, cliqueFound);
+
+            R.erase(v);
+            P.erase(v);
+            X.insert(v);
+        }
     }
+    #pragma omp taskwait
     return cliqueFound;
 }
 
-
-// Parallel implementation of bron-kerbosch algorithm
-bool bronKerboschParallel(const std::map<int,std::set<int>>& graph, int k) {
+bool bronKerboschParallel(const std::map<int, std::set<int>>& graph, int k) {
     if (k > graph.size()) {
         return false;
     }
-    std::set<int> r;
-    std::set<int> p;
-    std::set<int> x;
+    std::set<int> R, P, X;
+    bool cliqueFound = false;
 
     for (const auto& entry : graph) {
-        p.insert(entry.first);
+        P.insert(entry.first);
     }
-    return bronKerboschRecurseP(r, p, x, graph, k);
+
+    bronKerboschRecurseP(R, P, X, graph, k, cliqueFound);
+    return cliqueFound;
 }
 
 
@@ -155,13 +141,16 @@ int main(int argc, char *argv[]) {
             break;
         case 'h':
             displayUsage();
+            MPI_Finalize();
             return 0;
         case '?':
             displayUsage();
+            MPI_Finalize();
             return 0;
         default:
             std::cerr << "Unknown option: " << static_cast<char>(optopt) << std::endl;
             displayUsage();
+            MPI_Finalize();
             return 0;
         }
     }
@@ -235,6 +224,8 @@ int main(int argc, char *argv[]) {
     }
 
     // Generate random graph with command line size and density
+    // and send to other processes. We are not implementing MPI for
+    // Bron-Kerbosch currently though.
     std::map<int, std::set<int>> graph;
     int** matrix;
     if (pid == 0) {
@@ -256,24 +247,24 @@ int main(int argc, char *argv[]) {
     }
     MPI_Barrier(MPI_COMM_WORLD);
 
-    Timer parallelTimer;
-    bool parRes = bronKerboschParallel(graph, t);
-    double parSimTime = parallelTimer.elapsed();
-
-    Timer seqTimer;
-    bool seqRes = bronKerbosch(graph, t);
-    double seqSimTime = seqTimer.elapsed();
-
     if (pid == 0) {
+        Timer parallelTimer;
+        bool parRes = bronKerboschParallel(graph, t);
+        double parSimTime = parallelTimer.elapsed();
+
+        Timer seqTimer;
+        bool seqRes = bronKerbosch(graph, t);
+        double seqSimTime = seqTimer.elapsed();
+
         if (parRes != seqRes) {
             std::cout << "Error: Parallel and Sequential Returned Different Values" << std::endl;
             MPI_Finalize();
             return 0;
         }
 
-        std::cout << std::left << "\n" << std::setw(15) << "Sequential" << std::setw(15) 
-        << "Parallel" << std::setw(15) << "Speedup" << std::setw(15) 
-        << "Contains Clique?" << std::endl;
+        std::cout << std::left << "\n" << std::setw(15) << "Sequential" 
+        << std::setw(15) << "Parallel" << std::setw(15) << "Speedup" 
+        << std::setw(15) << "Contains Clique?" << std::endl;
 
         std::cout << "--------------------------------------------------------------" << std::endl;
 
