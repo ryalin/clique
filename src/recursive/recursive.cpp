@@ -17,7 +17,8 @@ bool connected(std::map<int,std::set<int>> graph, std::set<int> curr, int newAdd
 }
 
 // Recursive funciton to check for cliques
-bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, std::set<int> currClique, std::set<int> allNeighbors) {
+bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, 
+                     std::set<int> currClique, std::set<int> allNeighbors) {
   if (currClique.size() >= targetCount) return true;
   bool found = false;
   for (std::set<int>::iterator i = allNeighbors.begin(); i != allNeighbors.end(); i++) {
@@ -44,7 +45,6 @@ bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount) {
     std::set<int> starter = {node};
     bool res = recursiveHelper(graph, targetCount, starter, neighbors);
     if (res)  {
-      std::cout << "FOUND NODE: " << node << std::endl;
       return true;
     }
   }

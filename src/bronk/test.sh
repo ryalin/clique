@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the common flags
-COMMON_FLAGS="-t 6 -d 0.05 -s 200"
+COMMON_FLAGS="-t 10 -d 0.1 -s 100"
 
 # Specify the range of values for the -d flag
 START_D=2

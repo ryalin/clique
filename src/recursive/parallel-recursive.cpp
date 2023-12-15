@@ -5,6 +5,7 @@
 #include <set>
 #include <mpi.h>
 #include <getopt.h>
+#include <omp.h>
 
 #include "recursive.h"
 #include "../test.h"
@@ -97,7 +98,6 @@ bool parallelRecursive(std::map<int,std::set<int>> graph, int targetCount) {
     if (ret) continue;
     int key = i;
     std::set<int> val = graph[key];
-    // if (val.size() + 1 < targetCount) continue;
     #pragma omp task shared(ret) if (!ret)
     {
     std::set<int> starter = {key};

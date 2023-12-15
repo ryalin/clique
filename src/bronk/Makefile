@@ -2,6 +2,7 @@ CXX = mpic++
 MPICXX = mpic++
 CPPFLAGS = -Wall -g -std=c++11 -fopenmp
 LDFLAGS = -pthread
+OMP_NUM_THREADS = 8
 
 TARGET = clique
 SRCS = bron-kerbosch.cpp parallel-bronk.cpp ../test.cpp ../util.cpp
