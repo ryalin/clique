@@ -2,7 +2,7 @@ CXX = mpic++
 MPICXX = mpic++
 CPPFLAGS = -Wall -g -std=c++11 -fopenmp
 LDFLAGS = -pthread
-OMP_NUM_THREADS = 8
+OMP_NUM_THREADS = 1
 
 TARGET = clique
 SRCS = parallel-recursive.cpp recursive.cpp ../test.cpp ../util.cpp

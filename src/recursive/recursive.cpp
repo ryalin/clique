@@ -3,7 +3,7 @@
 #include <set>
 #include <iostream>
 
-#define IMM true // Immediate return upon finding target clique
+//#define IMM true // Immediate return upon finding target clique
 
 //Checks if the node we want to add is connected to all nodes in curr
 bool connected(std::map<int,std::set<int>> graph, std::set<int> curr, int newAdd) {
@@ -19,7 +19,7 @@ bool connected(std::map<int,std::set<int>> graph, std::set<int> curr, int newAdd
 }
 
 // Recursive funciton to check for cliques
-bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, std::set<int> currClique, std::set<int> allNeighbors) {
+bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, std::set<int> currClique, std::set<int> allNeighbors, bool IMM) {
   if (currClique.size() >= targetCount) return true;
   bool found = false;
   for (std::set<int>::iterator i = allNeighbors.begin(); i != allNeighbors.end(); i++) {
@@ -29,7 +29,7 @@ bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, std::se
     if ((currClique.find(neighbor) == currClique.end()) && connected(graph, currClique, neighbor)) {
       std::set<int> newCurrClique = currClique;
       newCurrClique.insert(neighbor);
-      bool res = recursiveHelper(graph, targetCount, newCurrClique, allNeighbors);
+      bool res = recursiveHelper(graph, targetCount, newCurrClique, allNeighbors, IMM);
       if (IMM) {
         if (res) return true;
       } else {
@@ -41,14 +41,14 @@ bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, std::se
 }
 
 // Recursive clique size-finding wrapper
-bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount) {
+bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount, bool IMM) {
   bool found = false;
   // Loop through all the keys
   for (const auto& entry: graph) {
     int node = entry.first;
     std::set<int> neighbors = graph[node];
     std::set<int> starter = {node};
-    bool res = recursiveHelper(graph, targetCount, starter, neighbors);
+    bool res = recursiveHelper(graph, targetCount, starter, neighbors, IMM);
     if (IMM) {
       if (res) return true;
     } else {

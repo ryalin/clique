@@ -1,0 +1,228 @@
+RECURSIVE
+mpirun -np 8 ./clique -s 20 -d .1 -t 6
+
+------ Test with graph size 20, density 0.1000, target 6 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.00184483     0.00184055     0.195682       0.00942771     0.00940582     0              
+
+mpirun -np 8 ./clique -s 20 -d .1 -t 3
+
+------ Test with graph size 20, density 0.1000, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.0002052      0.00180472     0.209902       0.000977599    0.0085979      1              
+
+mpirun -np 8 ./clique -s 20 -d .5 -t 10
+
+------ Test with graph size 20, density 0.5000, target 10 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+2.3788         2.41427        0.737891       3.22378        3.27185        0              
+
+mpirun -np 8 ./clique -s 20 -d .5 -t 6
+
+------ Test with graph size 20, density 0.5000, target 6 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.023307       0.7566         0.307083       0.075898       2.46383        1              
+
+mpirun -np 8 ./clique -s 20 -d .5 -t 3
+
+------ Test with graph size 20, density 0.5000, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.000190795    0.103781       0.198817       0.00095965     0.521993       1              
+
+mpirun -np 8 ./clique -s 20 -d .5 -t 3
+
+------ Test with graph size 20, density 0.5000, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.000201764    0.0985251      0.207343       0.000973093    0.47518        1              
+
+mpirun -np 8 ./clique -s 20 -d .3 -t 6
+
+------ Test with graph size 20, density 0.3000, target 6 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.0201964      0.0202458      0.215786       0.0935946      0.0938235      0              
+
+mpirun -np 8 ./clique -s 50 -d .1 -t 6
+
+------ Test with graph size 50, density 0.1000, target 6 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.0978811      3.5e-08        0.201359       0.486102       1.73819e-07    0              
+
+mpirun -np 8 ./clique -s 50 -d .1 -t 3
+
+------ Test with graph size 50, density 0.1000, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.000322517    3.5e-08        0.176789       0.00182431     1.97977e-07    1              
+
+mpirun -np 8 ./clique -s 50 -d .5 -t 10
+
+------ Test with graph size 50, density 0.5000, target 10 ------
+mpirun -np 8 ./clique -s 20 -d .1 -t 6
+
+------ Test with graph size 20, density 0.1000, target 6 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.00280538     0.00279238     0.213462       0.0131423      0.0130814      0              
+
+mpirun -np 8 ./clique -s 20 -d .1 -t 3
+
+------ Test with graph size 20, density 0.1000, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+8.4729e-05     0.00118638     0.183743       0.000461128    0.00645673     1              
+
+mpirun -np 8 ./clique -s 20 -d .5 -t 10
+
+------ Test with graph size 20, density 0.5000, target 10 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.680805       0.680883       0.443457       1.53522        1.5354         0              
+
+mpirun -np 8 ./clique -s 20 -d .5 -t 6
+
+------ Test with graph size 20, density 0.5000, target 6 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.502099       0.47839        0.387501       1.29574        1.23455        0              
+
+mpirun -np 8 ./clique -s 20 -d .5 -t 3
+
+------ Test with graph size 20, density 0.5000, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.000231       0.147218       0.20448        0.00112969     0.719962       1              
+
+mpirun -np 8 ./clique -s 20 -d .5 -t 3
+
+------ Test with graph size 20, density 0.5000, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.000169973    0.0823056      0.207256       0.000820111    0.39712        1              
+
+mpirun -np 8 ./clique -s 20 -d .3 -t 6
+
+------ Test with graph size 20, density 0.3000, target 6 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.0267182      0.0267227      0.205652       0.129919       0.129941       0              
+
+mpirun -np 8 ./clique -s 50 -d .1 -t 6
+
+------ Test with graph size 50, density 0.1000, target 6 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.110968       2.9e-08        0.259872       0.427012       1.11593e-07    0              
+
+mpirun -np 8 ./clique -s 50 -d .1 -t 3
+
+------ Test with graph size 50, density 0.1000, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.00239814     3.4e-08        0.188294       0.0127361      1.80568e-07    1              
+
+mpirun -np 8 ./clique -s 50 -d .5 -t 6
+
+------ Test with graph size 50, density 0.5000, target 6 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.0293854      3.6e-08        1.05774        0.0277813      3.40349e-08    1              
+
+mpirun -np 8 ./clique -s 50 -d .5 -t 3
+
+------ Test with graph size 50, density 0.5000, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.00108599     3.5e-08        0.197769       0.00549122     1.76974e-07    1              
+
+mpirun -np 8 ./clique -s 50 -d .3 -t 3
+
+------ Test with graph size 50, density 0.3000, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.00092502     3.6e-08        0.193048       0.00479167     1.86483e-07    1              
+
+mpirun -np 8 ./clique -s 50 -d .3 -t 6
+
+------ Test with graph size 50, density 0.3000, target 6 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+15.7124        3.6e-08        2.84595        5.52097        1.26495e-08    0              
+
+mpirun -np 8 ./clique -s 100 -d .1 -t 6
+
+------ Test with graph size 100, density 0.1000, target 6 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+2.26065        3.5e-08        0.607237       3.72285        5.76381e-08    0              
+
+mpirun -np 8 ./clique -s 100 -d .1 -t 3
+
+------ Test with graph size 100, density 0.1000, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.0195156      3.7e-08        0.233371       0.0836249      1.58546e-07    1              
+
+mpirun -np 8 ./clique -s 100 -d .2 -t 6
+
+------ Test with graph size 100, density 0.2000, target 6 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+136.668        4.6e-08        17.3002        7.89981        2.65893e-09    0              
+
+mpirun -np 8 ./clique -s 100 -d .2 -t 3
+
+------ Test with graph size 100, density 0.2000, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.00577229     3.6e-08        0.237793       0.0242744      1.51392e-07    1              
+
+mpirun -np 8 ./clique -s 100 -d .02 -t 3
+
+------ Test with graph size 100, density 0.0200, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.00087261     3.5e-08        0.204569       0.00426559     1.71091e-07    1              
+
+mpirun -np 8 ./clique -s 100 -d .01 -t 3
+
+------ Test with graph size 100, density 0.0100, target 3 ------
+
+Sequential F   Sequential S   Parallel       Speedup Fast   Speedup Slow   Contains Clique?
+--------------------------------------------------------------
+0.00500199     3.6e-08        0.198271       0.0252281      1.8157e-07     0              
+
