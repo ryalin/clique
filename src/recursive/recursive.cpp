@@ -3,8 +3,6 @@
 #include <set>
 #include <iostream>
 
-//#define IMM true // Immediate return upon finding target clique
-
 //Checks if the node we want to add is connected to all nodes in curr
 bool connected(std::map<int,std::set<int>> graph, std::set<int> curr, int newAdd) {
   std::set<int> newAddNeighbors = graph[newAdd];
@@ -29,12 +27,8 @@ bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, std::se
     if ((currClique.find(neighbor) == currClique.end()) && connected(graph, currClique, neighbor)) {
       std::set<int> newCurrClique = currClique;
       newCurrClique.insert(neighbor);
-      bool res = recursiveHelper(graph, targetCount, newCurrClique, allNeighbors, IMM);
-      if (IMM) {
-        if (res) return true;
-      } else {
-        found = found | res;
-      }
+      bool res = recursiveHelper(graph, targetCount, newCurrClique, allNeighbors);
+      if (res) return true;
     }
   }
   return found;
@@ -48,12 +42,8 @@ bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount, boo
     int node = entry.first;
     std::set<int> neighbors = graph[node];
     std::set<int> starter = {node};
-    bool res = recursiveHelper(graph, targetCount, starter, neighbors, IMM);
-    if (IMM) {
-      if (res) return true;
-    } else {
-      found = found | res;
-    }
+    bool res = recursiveHelper(graph, targetCount, starter, neighbors);
+    if (res) return true;
   }
   return found;
 }
