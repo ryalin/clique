@@ -60,7 +60,7 @@ After a meeting with professor and a couple hours of experimentation, we decided
 | 11/25 - 12/1 | - Improving codebase, test file generation scripts | - Start OpenMP parallelization |
 | 12/2 - 12/5 | - Benchmark OpenMP results, assist on parallelization | - Finish parallelization with OpenMP |
 | 12/6 - 12/8 | - Clean up codebase and ensure robust testing, assistance on parallelization | - Add MPI to existing parallel code |
-| 12/9 - 12/12 | - Start Bron-Kerbosch algorithm parallelization | - Help Ryan |
+| 12/9 - 12/12 | - Start Bron-Kerbosch algorithm parallelization | - Same as Ryan |
 | 12/13 - 12/15 | - Benchmarking results, writing final project report, prepare poster | Same as Ryan |
 
 ## Milestone Report
