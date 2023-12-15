@@ -54,22 +54,19 @@ def generateMultiClique(cliqueSizes):
 
 # Generates a random graph given graphSize
 # used for benchmarking
-def generateRandomGraph(graphSize):
-  graph = dict()
+def randomGraph(graphSize, edgeProb):
+  graph = {}
+  random.seed()
 
-  for node in range(graphSize):
-    graph[node] = set()
-
-  # For each node, generate random list of neighbors
-  for node in range(0, graphSize):
-     randomSetSize = random.randint(1, graphSize - 1)
-
-     while len(graph[node]) < randomSetSize:
-       randomNeighbor = random.randint(0, graphSize - 1)
-       if node != randomNeighbor:
-         graph[node].add(randomNeighbor)
-         graph[randomNeighbor].add(node)
-
+  for i in range(graphSize):
+      for j in range(i + 1, graphSize):
+          if random.random() < edgeProb:
+              if i not in graph:
+                  graph[i] = set()
+              if j not in graph:
+                  graph[j] = set()
+              graph[i].add(j)
+              graph[j].add(i)
   return graph
 
 
@@ -85,17 +82,65 @@ def saveGraphToTxt(graph, filename):
 # Add test cases here
 if __name__ == "__main__":
     
-    # One clique test files
-    oneClique5 = generateOneClique(5)
-    saveGraphToTxt(oneClique5, 'one_clique5.txt')
+  # One clique test files
+  oneClique5 = generateOneClique(5)
+  saveGraphToTxt(oneClique5, 'one_clique5.txt')
 
-    oneClique15 = generateOneClique(15)
-    saveGraphToTxt(oneClique15, 'one_clique15.txt')
+  oneClique15 = generateOneClique(15)
+  saveGraphToTxt(oneClique15, 'one_clique15.txt')
 
-    oneClique30 = generateOneClique(30)
-    saveGraphToTxt(oneClique30, 'one_clique30.txt')
+  oneClique30 = generateOneClique(30)
+  saveGraphToTxt(oneClique30, 'one_clique30.txt')
 
-    # Multiple clique test file
-    multiTest = [10, 20, 30, 40, 50, 60, 70, 80]
-    multiClique = generateMultiClique(multiTest)
-    saveGraphToTxt(multiClique, 'multi_clique.txt')
+  # Multiple clique test file
+  multiTest = [10, 20, 30, 40, 50, 60, 70, 80]
+  multiClique = generateMultiClique(multiTest)
+  saveGraphToTxt(multiClique, 'multi_clique.txt')
+
+  multiTest1 = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4]
+  multiClique1 = generateMultiClique(multiTest1)
+  saveGraphToTxt(multiClique1, 'multiDense1.txt')
+
+  multiTest2 = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4]
+  multiClique2 = generateMultiClique(multiTest2)
+  saveGraphToTxt(multiClique2, 'multiDense2.txt')
+
+  multiTest3 = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 4]
+  multiClique3 = generateMultiClique(multiTest3)
+  saveGraphToTxt(multiClique3, 'multiDense3.txt')
+
+  multiTest4 = [3, 1, 1, 3, 2, 1, 1, 1, 2, 1, 3, 1, 2, 2, 1, 2, 1, 1, 1, 2, 2, 1, 2, 1, 1, 2, 1, 4]
+  multiClique4 = generateMultiClique(multiTest4)
+  saveGraphToTxt(multiClique4, 'multiSparse1.txt')
+
+  multiTest5 = [3, 1, 1, 3, 2, 1, 1, 1, 2, 1, 4, 1, 2, 2, 1, 2, 1, 1, 1, 2, 2, 1, 2, 1, 1, 2, 1, 2]
+  multiClique5 = generateMultiClique(multiTest5)
+  saveGraphToTxt(multiClique5, 'multiSparse2.txt')
+
+  multiTest6 = [3, 1, 1, 3, 2, 1, 1, 1, 2, 1, 3, 1, 2, 2, 1, 2, 1, 1, 1, 4, 2, 1, 2, 1, 1, 2, 1, 2]
+  multiClique6 = generateMultiClique(multiTest6)
+  saveGraphToTxt(multiClique6, 'multiSparse3.txt')
+
+  multiTest7 = [3, 2, 2, 3, 2, 1, 1, 3, 3, 1, 3, 1, 2, 3, 1, 2, 3, 3, 3, 3, 2, 1, 2, 1, 1, 2, 1, 4]
+  multiClique7 = generateMultiClique(multiTest7)
+  saveGraphToTxt(multiClique7, 'multiMedium1.txt')
+
+  multiTest8 = [3, 2, 2, 3, 2, 1, 1, 3, 3, 1, 3, 1, 4, 3, 1, 2, 3, 3, 3, 3, 2, 1, 2, 1, 1, 2, 1, 2]
+  multiClique8 = generateMultiClique(multiTest8)
+  saveGraphToTxt(multiClique8, 'multiMedium2.txt')
+
+  multiTest9 = [3, 2, 2, 3, 2, 1, 1, 3, 3, 1, 3, 1, 2, 3, 1, 2, 3, 3, 3, 4, 2, 1, 2, 1, 1, 2, 1, 2]
+  multiClique9 = generateMultiClique(multiTest9)
+  saveGraphToTxt(multiClique9, 'multiMedium3.txt')
+
+  rg1 = randomGraph(100, 0.1)
+  saveGraphToTxt(rg1, 'recurse_100_01.txt')
+
+  rg2 = randomGraph(50, 0.2)
+  saveGraphToTxt(rg2, 'recurse_50_02.txt')
+
+  rg3 = randomGraph(10000, 0.01)
+  saveGraphToTxt(rg3, 'bronk_10000_001.txt')
+
+  rg4 = randomGraph(1000, 0.1)
+  saveGraphToTxt(rg4, 'bronk_1000_01.txt')

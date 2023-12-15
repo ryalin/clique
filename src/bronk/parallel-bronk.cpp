@@ -247,7 +247,7 @@ int main(int argc, char *argv[]) {
     }
     MPI_Barrier(MPI_COMM_WORLD);
 
-    if (pid == 0) {
+    if (pid == 0) {        
         Timer parallelTimer;
         bool parRes = bronKerboschParallel(graph, t);
         double parSimTime = parallelTimer.elapsed();

@@ -5,6 +5,7 @@
 #include <set>
 #include <mpi.h>
 #include <getopt.h>
+#include <omp.h>
 
 #include "recursive.h"
 #include "../test.h"
@@ -98,7 +99,6 @@ bool parallelRecursive(std::map<int,std::set<int>> graph, int targetCount) {
     if (ret) continue;
     int key = i;
     std::set<int> val = graph[key];
-    // if (val.size() + 1 < targetCount) continue;
     #pragma omp task shared(ret) if (!ret)
     {
     std::set<int> starter = {key};
@@ -273,6 +273,7 @@ int main(int argc, char *argv[]) {
   graph = multiCliqueGraph({3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4});
   graph = multiCliqueGraph({5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6});
   MPI_Barrier(MPI_COMM_WORLD);
+
   Timer parallelTimer;
   bool parRes = parallelRecursive(graph, t);
   double parSimTime = parallelTimer.elapsed();

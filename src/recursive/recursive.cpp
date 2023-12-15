@@ -17,7 +17,8 @@ bool connected(std::map<int,std::set<int>> graph, std::set<int> curr, int newAdd
 }
 
 // Recursive funciton to check for cliques
-bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, std::set<int> currClique, std::set<int> allNeighbors, bool IMM) {
+bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, 
+                     std::set<int> currClique, std::set<int> allNeighbors) {
   if (currClique.size() >= targetCount) return true;
   bool found = false;
   for (std::set<int>::iterator i = allNeighbors.begin(); i != allNeighbors.end(); i++) {
@@ -28,14 +29,14 @@ bool recursiveHelper(std::map<int,std::set<int>> graph, int targetCount, std::se
       std::set<int> newCurrClique = currClique;
       newCurrClique.insert(neighbor);
       bool res = recursiveHelper(graph, targetCount, newCurrClique, allNeighbors);
-      if (res) return true;
+      if (res) return true; 
     }
   }
   return found;
 }
 
 // Recursive clique size-finding wrapper
-bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount, bool IMM) {
+bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount) {
   bool found = false;
   // Loop through all the keys
   for (const auto& entry: graph) {
@@ -43,7 +44,9 @@ bool sequentialRecursive(std::map<int,std::set<int>> graph, int targetCount, boo
     std::set<int> neighbors = graph[node];
     std::set<int> starter = {node};
     bool res = recursiveHelper(graph, targetCount, starter, neighbors);
-    if (res) return true;
+    if (res)  {
+      return true;
+    }
   }
   return found;
 }

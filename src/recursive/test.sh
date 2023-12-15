@@ -1,26 +1,18 @@
-#Smaller
-make run FLAGS="-s 20 -d .1 -t 6"
-make run FLAGS="-s 20 -d .1 -t 3"
-make run FLAGS="-s 20 -d .5 -t 10"
-make run FLAGS="-s 20 -d .5 -t 6"
-make run FLAGS="-s 20 -d .5 -t 3"
-make run FLAGS="-s 20 -d .5 -t 3"
-make run FLAGS="-s 20 -d .3 -t 6"
+#!/bin/bash
 
-#Medium
-make run FLAGS="-s 50 -d .1 -t 6"
-make run FLAGS="-s 50 -d .1 -t 3"
-#make run FLAGS="-s 50 -d .5 -t 10"
-make run FLAGS="-s 50 -d .5 -t 6"
-make run FLAGS="-s 50 -d .5 -t 3"
-make run FLAGS="-s 50 -d .3 -t 3"
-make run FLAGS="-s 50 -d .3 -t 6"
+COMMON_FLAGS="-t 6 -d 0.05 -s 200"
 
-#Big
-make run FLAGS="-s 100 -d .1 -t 6"
-make run FLAGS="-s 100 -d .1 -t 3"
-#make run FLAGS="-s 100 -d .2 -t 10"
-make run FLAGS="-s 100 -d .2 -t 6"
-make run FLAGS="-s 100 -d .2 -t 3"
-make run FLAGS="-s 100 -d .02 -t 3"
-make run FLAGS="-s 100 -d .01 -t 3"
+START_D=2
+END_D=8
+STEP_D=1
+
+d_values=($(seq $START_D $STEP_D $END_D))
+
+for current_d in "${d_values[@]}"; do
+    COMMAND="make run FLAGS=\"$COMMON_FLAGS\""
+
+    echo "Running command: $COMMAND"
+    export OMP_NUM_THREADS="$current_d"
+    eval $COMMAND
+done
+
