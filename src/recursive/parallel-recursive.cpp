@@ -90,7 +90,6 @@ bool parallelRecursive(std::map<int,std::set<int>> graph, int targetCount) {
   int lower = pid * chunkSize;
   int upper = (pid + 1) * chunkSize;
   if (upper > graphSize) upper = graphSize;
-  //std::cout << pid << " upper: " << upper << " lower: " << lower << std::endl;
 
   bool ret = false;
   #pragma omp parallel 
@@ -199,7 +198,7 @@ int main(int argc, char *argv[]) {
 
       // Check if clique is in graph
       bool res1 = parallelRecursive(graph.nodes, graph.targetSize);
-      bool res2 = sequentialRecursive(graph.nodes, graph.targetSize, true);
+      bool res2 = sequentialRecursive(graph.nodes, graph.targetSize);
       if ((res1 != res2) && (pid == 0)) {
         std::cerr << "Error: sequential and parallel returned different results" << std::endl;
         MPI_Finalize();
@@ -212,7 +211,7 @@ int main(int argc, char *argv[]) {
       }
       // Check if target size clique is non-existent
       res1 = parallelRecursive(graph.nodes, graph.targetSize + 2);
-      res2 = sequentialRecursive(graph.nodes, graph.targetSize + 2, true);
+      res2 = sequentialRecursive(graph.nodes, graph.targetSize + 2);
       if ((res1 != res2) && (pid == 0)) {
         std::cerr << "Error: sequential and parallel returned different results" << std::endl;
         MPI_Finalize();
@@ -231,7 +230,7 @@ int main(int argc, char *argv[]) {
               std::cout << "Running test multi_clique" << i * 20 << std::endl;
           }
           bool res1 = parallelRecursive(multi.nodes, i * 20);
-          bool res2 = sequentialRecursive(multi.nodes, i * 20, true);
+          bool res2 = sequentialRecursive(multi.nodes, i * 20);
           if ((res1 != res2) && (pid == 0)) {
               std::cerr << "Error: sequential and parallel returned different results" << std::endl;
               MPI_Finalize();
@@ -253,25 +252,23 @@ int main(int argc, char *argv[]) {
   // Generate random graph with command line size and density
   std::map<int, std::set<int>> graph;
   int** matrix;
-  // if (pid == 0) {
-  //   graph = multiCliqueGraph({3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4});
-  //   printf("\n------ Test with graph size %d %d, density %.4f, target %d ------\n", s, graph.size(), d, t);
-  //   matrix = mapToAdjacencyMatrix(graph, graph.size());
-  //   for (int receiver = 1; receiver < nproc; receiver++) {
-  //     for (int row = 0; row < s; row++) {
-  //       MPI_Send(matrix[row], s, MPI_INT, receiver, row, MPI_COMM_WORLD);
-  //     }
-  //   }
-  // } else {
-  //   matrix = new int*[s];
-  //   for (int row = 0; row < s; row++) {
-  //     matrix[row] = new int[s];
-  //     MPI_Recv(matrix[row], s, MPI_INT, 0, row, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-  //   }
-  //   graph = adjacencyMatrixToMap(matrix, graph.size());
-  // }
-  graph = multiCliqueGraph({3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4});
-  graph = multiCliqueGraph({5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6});
+  if (pid == 0) {
+    printf("\n------ Test with graph size %d, density %.4f, target %d ------\n", s, d, t);
+    graph = generateRandom(s, d);
+    matrix = mapToAdjacencyMatrix(graph, s);
+    for (int receiver = 1; receiver < nproc; receiver++) {
+      for (int row = 0; row < s; row++) {
+        MPI_Send(matrix[row], s, MPI_INT, receiver, row, MPI_COMM_WORLD);
+      }
+    }
+  } else {
+    matrix = new int*[s];
+    for (int row = 0; row < s; row++) {
+      matrix[row] = new int[s];
+      MPI_Recv(matrix[row], s, MPI_INT, 0, row, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    }
+    graph = adjacencyMatrixToMap(matrix, s);
+  }
   MPI_Barrier(MPI_COMM_WORLD);
 
   Timer parallelTimer;
@@ -279,31 +276,24 @@ int main(int argc, char *argv[]) {
   double parSimTime = parallelTimer.elapsed();
 
   Timer seqTimer;
-  bool seqRes = sequentialRecursive(graph, t, true);
+  bool seqRes = sequentialRecursive(graph, t);
   double seqSimTime = seqTimer.elapsed();
-
-  Timer seqTimerSlow;
-  bool seqResSlow;
-  if (s < 30) seqResSlow = sequentialRecursive(graph, t, false);
-  double seqSimTimeSlow = seqTimerSlow.elapsed();
 
   if (pid == 0) {
     if (parRes != seqRes) {
-      std::cout << "Error: Parallel and Sequential Returned Different Values" << parRes << seqRes << std::endl;
+      std::cout << "Error: Parallel and Sequential Returned Different Values" << std::endl;
       MPI_Finalize();
       return 0;
     }
-    std::cout << std::left << "\n" << std::setw(15) << "Sequential F" << std::setw(15) 
-    << "Sequential S" << std::setw(15) << "Parallel" 
-    << std::setw(15) << "Speedup Fast" << std::setw(15) << "Speedup Slow" << std::setw(15) 
+    std::cout << std::left << "\n" << std::setw(15) << "Sequential" << std::setw(15) 
+    << "Parallel"  << std::setw(15) << "Speedup" << std::setw(15) 
     << "Contains Clique?" << std::endl;
 
     std::cout << "--------------------------------------------------------------" << std::endl;
 
     std::cout << std::left << std::setw(15) << seqSimTime << std::setw(15) 
-    << seqSimTimeSlow << std::setw(15) << parSimTime << std::setw(15) 
-    << seqSimTime / parSimTime << std::setw(15) << seqSimTimeSlow / parSimTime << std::setw(15)
-    << std::setw(15) << parRes << "\n" << std::endl;
+    << parSimTime << std::setw(15) << seqSimTime / parSimTime << std::setw(15) 
+    << std::setw(15) << std::setw(15) << parRes << "\n" << std::endl;
   }
   MPI_Finalize();
   return 0;
